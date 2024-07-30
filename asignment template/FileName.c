@@ -32,6 +32,8 @@ const float FRAME_TIME_SEC = (1000 / TARGET_FPS) / 1000.0f;
 // Time we started preparing the current frame (in milliseconds since GLUT was initialized).
 unsigned int frameStartTime = 0;
 
+
+const unsigned int FramePixels = 700;
 /******************************************************************************
  * Keyboard Input Handling Setup
  ******************************************************************************/
@@ -75,8 +77,13 @@ typedef struct {
 	float dy;
 }Partical;
 
-Partical  part[1000];
+Partical  snow[1000];
 float lanscape[200];
+float snowHeight[200];
+
+int framesPassed = 0;
+
+
  /******************************************************************************
   * Entry Point (don't put anything except the main function here)
   ******************************************************************************/
@@ -86,7 +93,7 @@ void main(int argc, char** argv)
 	// Initialize the OpenGL window.
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(700, 700);
+	glutInitWindowSize(FramePixels, FramePixels);
 	glutCreateWindow("Animation");
 
 	// Set up the scene.
@@ -125,10 +132,10 @@ void display(void)
 
 	glClearColor(0.647, 0.898, 0.9686274,1);
 	glColor3f(1, 1, 1);
-	for (int i = 0; i < 500; i++) {
-		glPointSize(part[i].size);
+	for (int i = 0; i < 1000; i++) {
+		glPointSize(snow[i].size);
 		glBegin(GL_POINTS);
-		glVertex2f(part[i].location.x, part[i].location.y);
+		glVertex2f(snow[i].location.x, snow[i].location.y);
 		glEnd();
 	}
 	glColor3f(0.298, 0.6902, 0.0196);
@@ -249,12 +256,15 @@ void init(void)
 	srand((unsigned)time(NULL));
 
 	for (int i = 0; i < 1000; i++) {
-		part[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
-		part[i].location.y = 1.0f;
-		part[i].size = (((float)rand() / RAND_MAX) * 7.0f) +1.5f;
-		part[i].dy = ((((float)rand() / RAND_MAX) * 0.005f)+0.01f)* part[i].size;
+		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
+		snow[i].location.y = 1.0f;
+		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) +1.5f;
+		snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f)+0.01f)* snow[i].size;
 	}
+
+	//generating random lanscape where it is random but dosent have any to steep changes by comparing heigh to previous height
 	lanscape[0] = (((float)rand() / RAND_MAX) * 0.3f) - 0.8f;
+	snowHeight[0] = lanscape[0];
 	for (int i = 1; i < 200; i++) {
 		lanscape[i] = (((float)rand() / RAND_MAX) * 0.02f) - 0.01 +lanscape[i-1];
 		if (lanscape[i] > -0.4) {
@@ -263,7 +273,9 @@ void init(void)
 		else if (lanscape[i] < -0.75) {
 			lanscape[i] = -0.75;
 		}
+		snowHeight[i] = lanscape[i];
 	}
+	 
 }
 
 /*
@@ -276,14 +288,15 @@ void init(void)
 */
 void think(void)
 {
-
+	framesPassed++;
 	for (int i = 0; i < 1000; i++) {
-		part[i].location.y -= part[i].dy * FRAME_TIME_SEC;
-		if (part[i].location.y < -1) {
-			part[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
-			part[i].location.y = 1.0f;
-			part[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
-			part[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * part[i].size;
+		snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
+		int heightIndex = round((snow[i].location.x+1) * 100);
+		if ((snow[i].location.y -(snow[i].size / FramePixels)) < snowHeight[heightIndex]) {
+			snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
+			snow[i].location.y = 1.0f;
+			snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
+			snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
 		}
 	}
 	/*
