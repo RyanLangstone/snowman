@@ -75,13 +75,15 @@ typedef struct {
 	Position2 location;
 	float size;
 	float dy;
+	int landTime;
+	int lifetime;
 }Partical;
 
-Partical  snow[1000];
+Partical  snow[10000];
 float lanscape[200];
 float snowHeight[200];
 
-int framesPassed = 0;
+int framesPassed = 1;
 
 
  /******************************************************************************
@@ -132,12 +134,23 @@ void display(void)
 
 	glClearColor(0.647, 0.898, 0.9686274,1);
 	glColor3f(1, 1, 1);
-	for (int i = 0; i < 1000; i++) {
-		glPointSize(snow[i].size);
-		glBegin(GL_POINTS);
-		glVertex2f(snow[i].location.x, snow[i].location.y);
-		glEnd();
+	if (framesPassed < 100) {
+		for (int i = 0; i < framesPassed; i++) {
+			glPointSize(snow[i].size);
+			glBegin(GL_POINTS);
+			glVertex2f(snow[i].location.x, snow[i].location.y);
+			glEnd();
+		}
 	}
+	else {
+		for (int i = 0; i < 10000; i++) {
+			glPointSize(snow[i].size);
+			glBegin(GL_POINTS);
+			glVertex2f(snow[i].location.x, snow[i].location.y);
+			glEnd();
+		}
+	}
+
 	glColor3f(0.298, 0.6902, 0.0196);
 	glBegin(GL_QUAD_STRIP);
 	int num = 0;
@@ -255,11 +268,12 @@ void init(void)
 {
 	srand((unsigned)time(NULL));
 
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 10000; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 		snow[i].location.y = 1.0f;
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) +1.5f;
 		snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f)+0.01f)* snow[i].size;
+		snow[i].landTime = 0;
 	}
 
 	//generating random lanscape where it is random but dosent have any to steep changes by comparing heigh to previous height
@@ -288,15 +302,34 @@ void init(void)
 */
 void think(void)
 {
+	//srand((unsigned)time(NULL));
 	framesPassed++;
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 10000; i++) {
 		snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
 		int heightIndex = round((snow[i].location.x+1) * 100);
-		if ((snow[i].location.y -(snow[i].size / FramePixels)) < snowHeight[heightIndex]) {
+		if ((snow[i].location.y - (snow[i].size / FramePixels)) < snowHeight[heightIndex] && snow[i].landTime == 0) {
+			snow[i].landTime = framesPassed;
+			snowHeight[heightIndex] += snow[i].size / FramePixels;
+			snow[i].dy = 0;
+			snow[i].lifetime = (((int)rand() / RAND_MAX) * 5000) + 1000;
+			continue;
+		}
+		else if (snow[i].dy == 0 && (snow[i].location.y ) > snowHeight[heightIndex]) {
+			snow[i].location.y = snowHeight[heightIndex];
+		}
+		if ( framesPassed >  snow[i].landTime + snow[i].lifetime && snow[i].landTime != 0) {
+			for (int x = 0; x < 10000; x++) {
+				if ((round((snow[x].location.x + 1) * 100) == round((snow[i].location.x + 1) * 100) && snow[x].landTime !=0) && snow[x].location.y > snow[i].location.y) {
+					snow[x].location.y -= snow[i].size / FramePixels;
+				}
+			}
+			snowHeight[heightIndex] -= snow[i].size / FramePixels;
+			snow[i].landTime = 0;
 			snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 			snow[i].location.y = 1.0f;
 			snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
 			snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
+			
 		}
 	}
 	/*
