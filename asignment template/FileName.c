@@ -5,6 +5,7 @@
  * This template provides a basic FPS-limited render loop for an animated scene.
  *
  ******************************************************************************/
+#define _USE_MATH_DEFINES
 
 #include <Windows.h>
 #include <freeglut.h>
@@ -84,7 +85,7 @@ void main(int argc, char** argv)
 	// Initialize the OpenGL window.
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(800, 800);
+	glutInitWindowSize(700, 700);
 	glutCreateWindow("Animation");
 
 	// Set up the scene.
@@ -121,14 +122,45 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glClearColor(0.819, 0.956, 1,1);
-
-	for (int i = 0; i < 1000; i++) {
+	//glClearColor(0.611762, 0.886274, 0.9686274,1);
+	glColor3f(1, 1, 1);
+	for (int i = 0; i < 500; i++) {
 		glPointSize(part[i].size);
 		glBegin(GL_POINTS);
 		glVertex2f(part[i].location.x, part[i].location.y);
 		glEnd();
 	}
+	
+	glBegin(GL_TRIANGLE_FAN);
+		glColor3f(1, 1, 1);
+		glVertex2f(0,-0.66);
+		for (float x = 0; x < 2*M_PI; x +=0.01) {
+			//glColor3f(0.819, 0.956, 1);
+			glColor3f(0.6902, 0.83137, 0.8196);
+			glVertex2f(-0.15 * sin(x), -0.66 + 0.15 * cos(x));
+		}
+	glEnd();
+
+	glBegin(GL_TRIANGLE_FAN);
+		glColor3f(1, 1, 1);
+		glVertex2f(0, -0.42);
+		for (float x = 0; x < 2 * M_PI; x += 0.01) {
+			//glColor3f(0.819, 0.956, 1);
+			glColor3f(0.6902, 0.83137, 0.8196);
+			glVertex2f(-0.12 * sin(x), -0.42 + 0.12 * cos(x));
+		}
+	glEnd();
+
+	glBegin(GL_TRIANGLE_FAN);
+		glColor3f(1, 1, 1);
+		glVertex2f(0, -0.255);
+		for (float x = 0; x < 2 * M_PI; x += 0.01) {
+			//glColor3f(0.819, 0.956, 1);
+			glColor3f(0.6902, 0.83137, 0.8196);
+			glVertex2f(-0.07 * sin(x), -0.255 + 0.07 * cos(x));
+		}
+	glEnd();
+
 	glutSwapBuffers();
 	/*
 		TEMPLATE: REPLACE THIS COMMENT WITH YOUR DRAWING CODE
