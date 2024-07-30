@@ -84,7 +84,7 @@ float lanscape[200];
 float snowHeight[200];
 
 int framesPassed = 1;
-
+int activeSnow = 50;
 
  /******************************************************************************
   * Entry Point (don't put anything except the main function here)
@@ -268,11 +268,18 @@ void init(void)
 {
 	srand((unsigned)time(NULL));
 
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 50; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 		snow[i].location.y = 1.0f;
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) +1.5f;
 		snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f)+0.01f)* snow[i].size;
+		snow[i].landTime = 0;
+	}
+	for (int i = 50; i < 10000; i++) {
+		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
+		snow[i].location.y = 1.05f;
+		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
+		snow[i].dy = 0;
 		snow[i].landTime = 0;
 	}
 
@@ -287,7 +294,7 @@ void init(void)
 		else if (lanscape[i] < -0.75) {
 			lanscape[i] = -0.75;
 		}
-		snowHeight[i] = lanscape[i];
+		snowHeight[i] = lanscape[i]-0.003;
 	}
 	 
 }
@@ -304,21 +311,25 @@ void think(void)
 {
 	//srand((unsigned)time(NULL));
 	framesPassed++;
-	for (int i = 0; i < 10000; i++) {
+	if (activeSnow < 10000 && framesPassed%2 == 0) {
+		activeSnow++;
+		snow[activeSnow].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[activeSnow].size;
+	}
+	for (int i = 0; i < activeSnow; i++) {
 		snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
 		int heightIndex = round((snow[i].location.x+1) * 100);
-		if ((snow[i].location.y - (snow[i].size / FramePixels)) < snowHeight[heightIndex] && snow[i].landTime == 0) {
+		if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[heightIndex] && snow[i].landTime == 0) {
 			snow[i].landTime = framesPassed;
 			snowHeight[heightIndex] += snow[i].size / FramePixels;
 			snow[i].dy = 0;
-			snow[i].lifetime = (((int)rand() / RAND_MAX) * 5000) + 1000;
+			snow[i].lifetime = (((int)rand() / RAND_MAX) * 5000) + 2000;
 			continue;
 		}
 		else if (snow[i].dy == 0 && (snow[i].location.y ) > snowHeight[heightIndex]) {
 			snow[i].location.y = snowHeight[heightIndex];
 		}
 		if ( framesPassed >  snow[i].landTime + snow[i].lifetime && snow[i].landTime != 0) {
-			for (int x = 0; x < 10000; x++) {
+			for (int x = 0; x < activeSnow; x++) {
 				if ((round((snow[x].location.x + 1) * 100) == round((snow[i].location.x + 1) * 100) && snow[x].landTime !=0) && snow[x].location.y > snow[i].location.y) {
 					snow[x].location.y -= snow[i].size / FramePixels;
 				}
