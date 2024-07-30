@@ -76,7 +76,7 @@ typedef struct {
 }Partical;
 
 Partical  part[1000];
-float lanscape[5];
+float lanscape[200];
  /******************************************************************************
   * Entry Point (don't put anything except the main function here)
   ******************************************************************************/
@@ -123,7 +123,7 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	//glClearColor(0.611762, 0.886274, 0.9686274,1);
+	glClearColor(0.647, 0.898, 0.9686274,1);
 	glColor3f(1, 1, 1);
 	for (int i = 0; i < 500; i++) {
 		glPointSize(part[i].size);
@@ -131,17 +131,14 @@ void display(void)
 		glVertex2f(part[i].location.x, part[i].location.y);
 		glEnd();
 	}
+	glColor3f(0.298, 0.6902, 0.0196);
 	glBegin(GL_QUAD_STRIP);
-		glVertex2f(-1, -1);
-		glVertex2f(-1, lanscape[0]);
-		glVertex2f(-0.5, -1);
-		glVertex2f(-0.5, lanscape[1]);
-		glVertex2f(0, -1);
-		glVertex2f(0, lanscape[2]);
-		glVertex2f(0.5, -1);
-		glVertex2f(0.5, lanscape[3]);
-		glVertex2f(1, -1);
-		glVertex2f(1, lanscape[4]);
+	int num = 0;
+		for (float i = -1; i < 01; i += 0.0101) {
+			glVertex2f(i, -1);
+			glVertex2f(i, lanscape[num]);
+			num++;
+		}
 	glEnd();
 
 	glBegin(GL_TRIANGLE_FAN);
@@ -257,9 +254,15 @@ void init(void)
 		part[i].size = (((float)rand() / RAND_MAX) * 7.0f) +1.5f;
 		part[i].dy = ((((float)rand() / RAND_MAX) * 0.005f)+0.01f)* part[i].size;
 	}
-
-	for (int i = 0; i < 5; i++) {
-		lanscape[i] = (((float)rand() / RAND_MAX) * 0.3f) - 0.7f;
+	lanscape[0] = (((float)rand() / RAND_MAX) * 0.3f) - 0.8f;
+	for (int i = 1; i < 200; i++) {
+		lanscape[i] = (((float)rand() / RAND_MAX) * 0.02f) - 0.01 +lanscape[i-1];
+		if (lanscape[i] > -0.4) {
+			lanscape[i] = -0.4;
+		}
+		else if (lanscape[i] < -0.75) {
+			lanscape[i] = -0.75;
+		}
 	}
 }
 
