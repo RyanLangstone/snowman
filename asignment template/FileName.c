@@ -163,31 +163,31 @@ void display(void)
 
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(1, 1, 1);
-		glVertex2f(0,-0.66);
+		glVertex2f(0,lanscape[100]+0.1);
 		for (float x = 0; x < 2*M_PI; x +=0.01) {
 			//glColor3f(0.819, 0.956, 1);
 			glColor3f(0.6902, 0.83137, 0.8196);
-			glVertex2f(-0.15 * sin(x), -0.66 + 0.15 * cos(x));
+			glVertex2f(-0.15 * sin(x), lanscape[100]+0.1 + 0.15 * cos(x));
 		}
 	glEnd();
 
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(1, 1, 1);
-		glVertex2f(0, -0.42);
+		glVertex2f(0, lanscape[100]+0.36);
 		for (float x = 0; x < 2 * M_PI; x += 0.01) {
 			//glColor3f(0.819, 0.956, 1);
 			glColor3f(0.6902, 0.83137, 0.8196);
-			glVertex2f(-0.12 * sin(x), -0.42 + 0.12 * cos(x));
+			glVertex2f(-0.12 * sin(x), lanscape[100] + 0.36 + 0.12 * cos(x));
 		}
 	glEnd();
 
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(1, 1, 1);
-		glVertex2f(0, -0.255);
+		glVertex2f(0, lanscape[100] + 0.54);
 		for (float x = 0; x < 2 * M_PI; x += 0.01) {
 			//glColor3f(0.819, 0.956, 1);
 			glColor3f(0.6902, 0.83137, 0.8196);
-			glVertex2f(-0.07 * sin(x), -0.255 + 0.07 * cos(x));
+			glVertex2f(-0.07 * sin(x), lanscape[100] + 0.54 + 0.07 * cos(x));
 		}
 	glEnd();
 
