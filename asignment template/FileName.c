@@ -76,6 +76,7 @@ typedef struct {
 }Partical;
 
 Partical  part[1000];
+float lanscape[5];
  /******************************************************************************
   * Entry Point (don't put anything except the main function here)
   ******************************************************************************/
@@ -130,7 +131,19 @@ void display(void)
 		glVertex2f(part[i].location.x, part[i].location.y);
 		glEnd();
 	}
-	
+	glBegin(GL_QUAD_STRIP);
+		glVertex2f(-1, -1);
+		glVertex2f(-1, lanscape[0]);
+		glVertex2f(-0.5, -1);
+		glVertex2f(-0.5, lanscape[1]);
+		glVertex2f(0, -1);
+		glVertex2f(0, lanscape[2]);
+		glVertex2f(0.5, -1);
+		glVertex2f(0.5, lanscape[3]);
+		glVertex2f(1, -1);
+		glVertex2f(1, lanscape[4]);
+	glEnd();
+
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(1, 1, 1);
 		glVertex2f(0,-0.66);
@@ -243,6 +256,10 @@ void init(void)
 		part[i].location.y = 1.0f;
 		part[i].size = (((float)rand() / RAND_MAX) * 7.0f) +1.5f;
 		part[i].dy = ((((float)rand() / RAND_MAX) * 0.005f)+0.01f)* part[i].size;
+	}
+
+	for (int i = 0; i < 5; i++) {
+		lanscape[i] = (((float)rand() / RAND_MAX) * 0.3f) - 0.7f;
 	}
 }
 
