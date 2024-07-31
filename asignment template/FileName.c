@@ -159,7 +159,7 @@ void display(void)
 			num++;
 		}
 	glEnd();
-
+	
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(1, 1, 1);
 		glVertex2f(0,lanscape[100]+0.1);
@@ -290,7 +290,7 @@ void init(void)
 {
 	srand((unsigned)time(NULL));
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i <= activeSnow; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 		snow[i].location.y = 1.0f;
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) +1.5f;
@@ -298,7 +298,7 @@ void init(void)
 		snow[i].landTime = 0;
 		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 	}
-	for (int i = 50; i < 10000; i++) {
+	for (int i = activeSnow+1; i < 10000; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 		snow[i].location.y = 1.05f; // off render untill active
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
