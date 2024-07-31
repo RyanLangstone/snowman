@@ -12,6 +12,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
+#include <stdbool.h>
 
  /******************************************************************************
   * Animation & Timing Setup
@@ -53,6 +54,8 @@ void reshape(int width, int h);
 void keyPressed(unsigned char key, int x, int y);
 void idle(void);
 
+void circle(float radius, float x, float y, bool background);
+
 /******************************************************************************
  * Animation-Specific Function Prototypes (add your own here)
  ******************************************************************************/
@@ -77,11 +80,12 @@ typedef struct {
 	float dy;
 	int landTime;
 	int lifetime;
+	int depth;
 }Partical;
 
 Partical  snow[10000];
 float lanscape[200];
-float snowHeight[200];
+float snowHeight[3][200];
 
 int framesPassed = 1;
 int activeSnow = 50;
@@ -132,18 +136,13 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	bool firstPass; // variable so that you can run some things only once to improve eficency for example background calculation in circle function
+	if (framesPassed ==1) {firstPass = true;}
+	else { firstPass = false; }
 	glClearColor(0.647, 0.898, 0.9686274,1);
 	glColor3f(1, 1, 1);
-	if (framesPassed < 100) {
-		for (int i = 0; i < framesPassed; i++) {
-			glPointSize(snow[i].size);
-			glBegin(GL_POINTS);
-			glVertex2f(snow[i].location.x, snow[i].location.y);
-			glEnd();
-		}
-	}
-	else {
-		for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < activeSnow; i++) {
+		if (snow[i].depth <= 1) {
 			glPointSize(snow[i].size);
 			glBegin(GL_POINTS);
 			glVertex2f(snow[i].location.x, snow[i].location.y);
@@ -164,32 +163,34 @@ void display(void)
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(1, 1, 1);
 		glVertex2f(0,lanscape[100]+0.1);
-		for (float x = 0; x < 2*M_PI; x +=0.01) {
-			//glColor3f(0.819, 0.956, 1);
-			glColor3f(0.6902, 0.83137, 0.8196);
-			glVertex2f(-0.15 * sin(x), lanscape[100]+0.1 + 0.15 * cos(x));
-		}
+		glColor3f(0.6902, 0.83137, 0.8196);
+		circle(0.15, 0, lanscape[100] + 0.1, firstPass);
 	glEnd();
 
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(1, 1, 1);
 		glVertex2f(0, lanscape[100]+0.36);
-		for (float x = 0; x < 2 * M_PI; x += 0.01) {
-			//glColor3f(0.819, 0.956, 1);
-			glColor3f(0.6902, 0.83137, 0.8196);
-			glVertex2f(-0.12 * sin(x), lanscape[100] + 0.36 + 0.12 * cos(x));
-		}
+		glColor3f(0.6902, 0.83137, 0.8196);
+		circle(0.12, 0, lanscape[100] + 0.36, firstPass);
 	glEnd();
 
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(1, 1, 1);
 		glVertex2f(0, lanscape[100] + 0.54);
-		for (float x = 0; x < 2 * M_PI; x += 0.01) {
-			//glColor3f(0.819, 0.956, 1);
-			glColor3f(0.6902, 0.83137, 0.8196);
-			glVertex2f(-0.07 * sin(x), lanscape[100] + 0.54 + 0.07 * cos(x));
-		}
+		glColor3f(0.6902, 0.83137, 0.8196);
+		circle(0.07, 0, lanscape[100] + 0.54, firstPass);
 	glEnd();
+
+	// makes snow of depth level 2 render infront of objects
+	glColor3f(1, 1, 1);
+	for (int i = 0; i < activeSnow; i++) {
+		if (snow[i].depth == 2) {
+			glPointSize(snow[i].size); 
+			glBegin(GL_POINTS); 
+			glVertex2f(snow[i].location.x, snow[i].location.y); 
+			glEnd(); 
+		}
+	}
 
 	glutSwapBuffers();
 	/*
@@ -201,6 +202,27 @@ void display(void)
 		Remember to add prototypes for any new functions to the "Animation-Specific
 		Function Prototypes" section near the top of this template.
 	*/
+}
+
+void circle(float radius, float x, float y, bool background) {
+	if (background == false) {
+		for (float i = 0; i < 2 * M_PI; i += 0.01) {
+			glVertex2f(x + radius * sin(i), y + radius * cos(i));
+		}
+
+	}
+	else {
+		for (float i = 0; i < 2 * M_PI; i += 0.01) {
+			glVertex2f(x + radius * sin(i), y + radius * cos(i));
+			int heightIndex = round((x + radius * sin(i) + 1) * 100);
+			if (snowHeight[1][heightIndex] < y + radius * cos(i)) {
+				snowHeight[1][heightIndex] = y + radius * cos(i);
+			}
+			if (snowHeight[2][heightIndex] > y + radius * cos(i)) {
+				snowHeight[2][heightIndex] = y + radius * cos(i);
+			}
+		}
+	}
 }
 
 /*
@@ -274,18 +296,20 @@ void init(void)
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) +1.5f;
 		snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f)+0.01f)* snow[i].size;
 		snow[i].landTime = 0;
+		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 	}
 	for (int i = 50; i < 10000; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
-		snow[i].location.y = 1.05f;
+		snow[i].location.y = 1.05f; // off render untill active
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
-		snow[i].dy = 0;
-		snow[i].landTime = 0;
+		snow[i].dy = 0; // initial velocity to 0 untill activated
+		snow[i].landTime = 0; //shows it has not landed yet
+		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 	}
 
 	//generating random lanscape where it is random but dosent have any to steep changes by comparing heigh to previous height
 	lanscape[0] = (((float)rand() / RAND_MAX) * 0.3f) - 0.8f;
-	snowHeight[0] = lanscape[0];
+	snowHeight[0][0] = snowHeight[1][0] = snowHeight[2][0] = lanscape[0];
 	for (int i = 1; i < 200; i++) {
 		lanscape[i] = (((float)rand() / RAND_MAX) * 0.02f) - 0.01 +lanscape[i-1];
 		if (lanscape[i] > -0.4) {
@@ -294,7 +318,7 @@ void init(void)
 		else if (lanscape[i] < -0.75) {
 			lanscape[i] = -0.75;
 		}
-		snowHeight[i] = lanscape[i]-0.003;
+		snowHeight[0][i] = snowHeight[1][i] = snowHeight[2][i] = lanscape[i]-0.003;
 	}
 	 
 }
@@ -318,70 +342,30 @@ void think(void)
 	for (int i = 0; i < activeSnow; i++) {
 		snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
 		int heightIndex = round((snow[i].location.x+1) * 100);
-		if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[heightIndex] && snow[i].landTime == 0) {
+		if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight [snow[i].depth][heightIndex] && snow[i].landTime == 0) {
 			snow[i].landTime = framesPassed;
-			snowHeight[heightIndex] += snow[i].size / FramePixels;
+			snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
 			snow[i].dy = 0;
-			snow[i].lifetime = (((int)rand() / RAND_MAX) * 5000) + 2000;
+			snow[i].lifetime = rand() % 3500 + 2000;
 			continue;
 		}
-		else if (snow[i].dy == 0 && (snow[i].location.y ) > snowHeight[heightIndex]) {
-			snow[i].location.y = snowHeight[heightIndex];
+		else if (snow[i].dy == 0 && (snow[i].location.y ) > snowHeight[snow[i].depth][heightIndex]) {
+			snow[i].location.y = snowHeight[snow[i].depth][heightIndex];
 		}
 		if ( framesPassed >  snow[i].landTime + snow[i].lifetime && snow[i].landTime != 0) {
 			for (int x = 0; x < activeSnow; x++) {
-				if ((round((snow[x].location.x + 1) * 100) == round((snow[i].location.x + 1) * 100) && snow[x].landTime !=0) && snow[x].location.y > snow[i].location.y) {
+				if ((round((snow[x].location.x + 1) * 100) == round((snow[i].location.x + 1) * 100) && snow[x].landTime !=0) && snow[x].location.y > snow[i].location.y && snow[x].depth == snow[i].depth) {
 					snow[x].location.y -= snow[i].size / FramePixels;
 				}
 			}
-			snowHeight[heightIndex] -= snow[i].size / FramePixels;
+			snowHeight[snow[i].depth][heightIndex] -= snow[i].size / FramePixels;
 			snow[i].landTime = 0;
 			snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 			snow[i].location.y = 1.0f;
 			snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
 			snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
-			
+			snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 		}
 	}
-	/*
-		TEMPLATE: REPLACE THIS COMMENT WITH YOUR ANIMATION/SIMULATION CODE
-
-		In this function, we update all the variables that control the animated
-		parts of our simulated world. For example: if you have a moving box, this is
-		where you update its coordinates to make it move. If you have something that
-		spins around, here's where you update its angle.
-
-		NOTHING CAN BE DRAWN IN HERE: you can only update the variables that control
-		how everything will be drawn later in display().
-
-		How much do we move or rotate things? Because we use a fixed frame rate, we
-		assume there's always FRAME_TIME milliseconds between drawing each frame. So,
-		every time think() is called, we need to work out how far things should have
-		moved, rotated, or otherwise changed in that period of time.
-
-		Movement example:
-		* Let's assume a distance of 1.0 GL units is 1 metre.
-		* Let's assume we want something to move 2 metres per second on the x axis
-		* Each frame, we'd need to update its position like this:
-			x += 2 * (FRAME_TIME / 1000.0f)
-		* Note that we have to convert FRAME_TIME to seconds. We can skip this by
-		  using a constant defined earlier in this template:
-			x += 2 * FRAME_TIME_SEC;
-
-		Rotation example:
-		* Let's assume we want something to do one complete 360-degree rotation every
-		  second (i.e. 60 Revolutions Per Minute, or RPM).
-		* Each frame, we'd need to update our object's angle like this (we'll use the
-		  FRAME_TIME_SEC constant as per the example above):
-			a += 360 * FRAME_TIME_SEC;
-
-		This works for any type of "per second" change: just multiply the amount you'd
-		want to move in a full second by FRAME_TIME_SEC, and add or subtract that
-		from whatever variable you're updating.
-
-		You can use this same approach to animate other things like color, opacity,
-		brightness of lights, etc.
-	*/
+	
 }
-
-/******************************************************************************/
