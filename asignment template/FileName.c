@@ -53,6 +53,7 @@ void display(void);
 void reshape(int width, int h);
 void keyPressed(unsigned char key, int x, int y);
 void idle(void);
+void mouse(int button, int state, int x, int y);
 
 void circle(float radius, float x, float y, bool background);
 
@@ -63,7 +64,7 @@ void circle(float radius, float x, float y, bool background);
 void main(int argc, char** argv);
 void init(void);
 void think(void);
-
+void birdfunc();
 /******************************************************************************
  * Animation-Specific Setup (Add your own definitions, constants, and globals here)
  ******************************************************************************/
@@ -74,6 +75,14 @@ typedef struct{
 
 }Position2;
 
+typedef struct { 
+	// y=a(x-x2)^2 +y2 or // y=b(x-x2)^2 +y2
+	float A; 
+	float B;
+	float X2;
+	float Y2;
+}Quadric;
+
 typedef struct {
 	Position2 location;
 	float size;
@@ -83,13 +92,24 @@ typedef struct {
 	int depth;
 }Partical;
 
+typedef struct {
+	Position2 location;
+	Quadric formula;
+	float dx;
+}bird;
+
 Partical  snow[10000];
 float lanscape[200];
 float snowHeight[3][200];
 
+bird birds[50];
+int activeBird[50];
+
+
 int framesPassed = 1;
 int activeSnow = 50;
 
+GLfloat clickpos[2] = { 0,0 };
  /******************************************************************************
   * Entry Point (don't put anything except the main function here)
   ******************************************************************************/
@@ -113,7 +133,7 @@ void main(int argc, char** argv)
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyPressed);
 	glutIdleFunc(idle);
-
+	glutMouseFunc(mouse);
 	// Record when we started rendering the very first frame (which should happen after we call glutMainLoop).
 	frameStartTime = (unsigned int)glutGet(GLUT_ELAPSED_TIME);
 
@@ -192,6 +212,25 @@ void display(void)
 		}
 	}
 
+
+	glPointSize(10);
+	glColor3f(1, 0, 0);
+	glBegin(GL_POINTS);
+	glVertex2f(clickpos[0], clickpos[1]);
+	glEnd();
+	glColor3f(0.298, 0.6902, 0.0196);
+	glRasterPos2f(-0.8, 0.8);
+	glutBitmapCharacter(GLUT_BITMAP_8_BY_13, (char)(clickpos[0]));
+
+	for (int i = 0; i < 50; i++) {
+		if (activeBird[i] == 1) {
+			glPointSize(10);
+			glColor3f(1, 0, 0);
+			glBegin(GL_POINTS);
+			glVertex2f(birds[i].location.x, birds[i].location.y);
+			glEnd();
+		}
+	}
 	glutSwapBuffers();
 	/*
 		TEMPLATE: REPLACE THIS COMMENT WITH YOUR DRAWING CODE
@@ -235,6 +274,37 @@ void reshape(int width, int h)
 /*
 	Called each time a character key (e.g. a letter, number, or symbol) is pressed.
 */
+void mouse(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		clickpos[0]  = ((GLfloat)x / (GLfloat)FramePixels)*2-1;
+		clickpos[1] = ((GLfloat)y / (GLfloat)FramePixels )*-2+1;
+		birdfunc();
+	}
+}
+void birdfunc(void) {
+	float p1y = (((float)rand() / RAND_MAX) * 0.5f);
+	if (rand() % 2 == 1) {p1y = -p1y;}
+	p1y = p1y*(clickpos[0]+1);
+	p1y += clickpos[1];
+	float p2y = (((float)rand() / RAND_MAX) * 0.5f);
+	if (rand() % 2 == 1) { p2y = -p1y; }
+	p2y = p2y * ((clickpos[0] - 1)*-1);
+	p2y += clickpos[1];
+	for (int i = 0; i < 50; i++) { 
+		if (activeBird[i] == 0) { 
+			activeBird[i] = 1;
+			birds[i].formula.X2 = clickpos[0]; 
+			birds[i].formula.Y2 = clickpos[1];
+			birds[i].formula.A = (p1y - birds[i].formula.Y2) / pow((-1 - birds[i].formula.X2),2);
+			birds[i].formula.B = (p2y - birds[i].formula.Y2) / pow((1 - birds[i].formula.X2), 2);
+			birds[i].location.x = -1;
+			birds[i].location.y = p1y;
+			birds[i].dx = 0.05;
+			break;
+		} 
+	}
+}
+
 void keyPressed(unsigned char key, int x, int y)
 {
 	switch (tolower(key)) {
@@ -365,6 +435,19 @@ void think(void)
 			snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
 			snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
 			snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
+		}
+	}
+
+	for (int i = 0; i < 50; i++) {
+		if (activeBird[i] == 1) {
+			birds[i].location.x += birds[i].dx;
+			if (birds[i].location.x > 1) { activeBird[i] = 0; continue;}
+			if (birds[i].location.x <= birds[i].formula.X2) {
+				birds[i].location.y = birds[i].formula.A * pow((birds[i].location.x - birds[i].formula.X2), 2) + birds[i].formula.Y2;
+			}
+			else {
+				birds[i].location.y = birds[i].formula.B * pow((birds[i].location.x - birds[i].formula.X2), 2) + birds[i].formula.Y2;
+			}
 		}
 	}
 	
