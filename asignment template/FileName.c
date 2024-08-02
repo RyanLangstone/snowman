@@ -283,12 +283,12 @@ void mouse(int button, int state, int x, int y) {
 }
 void birdfunc(void) {
 	float p1y = (((float)rand() / RAND_MAX) * 0.5f);
+	p1y = p1y * (clickpos[0] + 1);
 	if (rand() % 2 == 1) {p1y = -p1y;}
-	p1y = p1y*(clickpos[0]+1);
 	p1y += clickpos[1];
 	float p2y = (((float)rand() / RAND_MAX) * 0.5f);
-	if (rand() % 2 == 1) { p2y = -p1y; }
 	p2y = p2y * ((clickpos[0] - 1)*-1);
+	if (rand() % 2 == 1) { p2y = -p2y; }
 	p2y += clickpos[1];
 	for (int i = 0; i < 50; i++) { 
 		if (activeBird[i] == 0) { 
@@ -299,7 +299,7 @@ void birdfunc(void) {
 			birds[i].formula.B = (p2y - birds[i].formula.Y2) / pow((1 - birds[i].formula.X2), 2);
 			birds[i].location.x = -1;
 			birds[i].location.y = p1y;
-			birds[i].dx = 0.05;
+			birds[i].dx = ((((float)rand() / RAND_MAX) * 0.05f) + 0.008f);
 			break;
 		} 
 	}
