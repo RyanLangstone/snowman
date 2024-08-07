@@ -55,7 +55,7 @@ void keyPressed(unsigned char key, int x, int y);
 void idle(void);
 void mouse(int button, int state, int x, int y);
 
-void circle(float radius, float x, float y, bool background);
+void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[3], float outerColor[3], float startPoint, float endPoint, bool background);
 
 /******************************************************************************
  * Animation-Specific Function Prototypes (add your own here)
@@ -173,7 +173,7 @@ void display(void)
 	glColor3f(0.298, 0.6902, 0.0196);
 	glBegin(GL_QUAD_STRIP);
 	int num = 0;
-	for (float i = -1; i < 01; i += 0.0101) {
+	for (float i = -1; i < 1; i += 0.0101) {
 		glVertex2f(i, -1);
 		glVertex2f(i, lanscape[num]);
 		num++;
@@ -182,9 +182,9 @@ void display(void)
 
 	float snowmanCenterColor[3] = { 1,1,1 };
 	float snowmanCuterColor[3] = { 0.6902, 0.83137, 0.8196 };
-	circle(0.15, 0, lanscape[100] + 0.1, firstPass, snowmanCenterColor, snowmanCuterColor);
-	circle(0.12, 0, lanscape[100] + 0.36, firstPass, snowmanCenterColor, snowmanCuterColor);
-	circle(0.07, 0, lanscape[100] + 0.54, firstPass, snowmanCenterColor, snowmanCuterColor);
+	circle(0.15, 0, lanscape[100] + 0.1, 0, lanscape[100] + 0.1, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.12, 0, lanscape[100] + 0.36, 0, lanscape[100] + 0.36, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.07, 0, lanscape[100] + 0.54, 0, lanscape[100] + 0.54, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 
 	// makes snow of depth level 2 render infront of objects
 	glColor3f(1, 1, 1);
@@ -214,12 +214,12 @@ void display(void)
 			glColor3f(1, 0, 0);
 			float birdCenterColor[3] = { 1,1,1 };
 			float birdCuterColor[3] = { 0, 0, 0 };
-			circle(0.03, birds[i].location.x, birds[i].location.y, false, birdCenterColor, birdCuterColor);
+			circle(0.03, birds[i].location.x, birds[i].location.y, birds[i].location.x, birds[i].location.y, birdCenterColor, birdCuterColor, 0, 2 * M_PI, false);
 			glBegin(GL_TRIANGLE_FAN);
-				glVertex2f(birds[i].location.x - 0.1, birds[i].location.y+ 0.1);
+				glVertex2f(birds[i].location.x - 0.04, birds[i].location.y-0.03);
 				float theta = M_PI;
 				for (float ii = 1.5*M_PI; ii < 2*M_PI; ii+= 0.01) {
-					glVertex2f(birds[i].location.x  + 0.1 * sin(ii), birds[i].location.y-0.13 + 0.1 * cos(ii));
+					glVertex2f(birds[i].location.x  + 0.04 * sin(ii), birds[i].location.y-0.09 + 0.06 * cos(ii));
 			//	glVertex2f((birds[i].location.x - 0.04 + 0.05 * sin(ii) + 0.1*cos(theta)),
 			//		(birds[i].location.y + 0.05 * cos(ii)) + 0.1 *sin(theta));
 			}
@@ -230,19 +230,19 @@ void display(void)
 	glutSwapBuffers();
 }
 
-void circle(float radius, float x, float y, bool background, float centerColor[3], float outerColor[3]) {
+void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[3], float outerColor[3], float startPoint, float endPoint, bool background){
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(centerColor[0], centerColor[1], centerColor[2]);
-		glVertex2f(x, y);
+		glVertex2f(centerX, centerY);
 		glColor3f(outerColor[0], outerColor[1], outerColor[2]);
 		if (background == false) {
-			for (float i = 0; i < 2 * M_PI; i += 0.01) {
+			for (float i = startPoint; i < endPoint; i += 0.01) {
 				glVertex2f(x + radius * sin(i), y + radius * cos(i));
 			}
 
 		}
 		else {
-			for (float i = 0; i < 2 * M_PI; i += 0.01) {
+			for (float i = startPoint; i < endPoint; i += 0.01) {
 				glVertex2f(x + radius * sin(i), y + radius * cos(i));
 				int heightIndex = round((x + radius * sin(i) + 1) * 100);
 				if (snowHeight[1][heightIndex] < y + radius * cos(i)) {
