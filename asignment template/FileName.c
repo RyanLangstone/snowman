@@ -108,7 +108,7 @@ int activeBird[50];
 
 int framesPassed = 1;
 int activeSnow = 50;
-
+float angle = 0;
 GLfloat clickpos[2] = { 0,0 };
  /******************************************************************************
   * Entry Point (don't put anything except the main function here)
@@ -121,6 +121,7 @@ void main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(FramePixels, FramePixels);
 	glutCreateWindow("Animation");
+	
 
 	// Set up the scene.
 	init();
@@ -211,20 +212,29 @@ void display(void)
 	for (int i = 0; i < 50; i++) {
 		if (activeBird[i] == 1) {
 			glPointSize(10);
-			glColor3f(1, 0, 0);
-			float birdCenterColor[3] = { 1,1,1 };
-			float birdCuterColor[3] = { 0, 0, 0 };
-			circle(0.03, birds[i].location.x, birds[i].location.y, birds[i].location.x, birds[i].location.y, birdCenterColor, birdCuterColor, 0, 2 * M_PI, false);
-			glBegin(GL_TRIANGLE_FAN);
-				glVertex2f(birds[i].location.x - 0.04, birds[i].location.y-0.03);
-				float theta = M_PI;
-				for (float ii = 1.5*M_PI; ii < 2*M_PI; ii+= 0.01) {
-					glVertex2f(birds[i].location.x  + 0.04 * sin(ii), birds[i].location.y-0.09 + 0.06 * cos(ii));
-			//	glVertex2f((birds[i].location.x - 0.04 + 0.05 * sin(ii) + 0.1*cos(theta)),
-			//		(birds[i].location.y + 0.05 * cos(ii)) + 0.1 *sin(theta));
-			}
-				
+			glColor3f(0, 0, 0);
+			
+			/*glBegin(GL_POLYGON);
+				glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI/4), birds[i].location.y + 0.025 * sin(angle + M_PI / 4));
+				glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI/2 + M_PI / 4), birds[i].location.y + 0.025 * sin(angle + M_PI / 2 + M_PI / 4));
+				glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI + M_PI / 4), birds[i].location.y + 0.025 * sin(angle + M_PI + M_PI / 4));
+				glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI *1.5 + M_PI / 4), birds[i].location.y + 0.025 * sin(angle + M_PI*1.5 + M_PI / 4));
 			glEnd();
+			glBegin(GL_POLYGON);
+			glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI / 4), birds[i].location.y + 0.025 * sin(angle + M_PI / 4));
+			glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI / 2 + M_PI / 4), birds[i].location.y + 0.025 * sin(angle + M_PI / 2 + M_PI / 4));
+			glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI + M_PI / 4), birds[i].location.y + 0.025 * sin(angle + M_PI + M_PI / 4));
+			glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI * 1.5 + M_PI / 4), birds[i].location.y + 0.025 * sin(angle + M_PI * 1.5 + M_PI / 4));
+			glEnd();*/
+			glBegin(GL_LINES);
+				glVertex2f(birds[i].location.x, birds[i].location.y );
+				glVertex2f(birds[i].location.x + 0.05 * cos(angle), birds[i].location.y + 0.05 * sin(angle));
+			glEnd();
+			float birdCenterColor[3] = { 0,0,0};
+			float birdCuterColor[3] = { 0, 0, 0 };
+			circle(0.02, birds[i].location.x+0.04 * cos(angle), birds[i].location.y+0.018 * sin(angle), birds[i].location.x+0.04 * cos(angle), birds[i].location.y+0.018 * sin(angle), birdCenterColor, birdCuterColor, 1.5 * M_PI,2.5 * M_PI, false);
+			circle(0.055, birds[i].location.x+0.085 * cos(angle), birds[i].location.y-0.04 * sin(angle), birds[i].location.x+0.035* cos(angle), birds[i].location.y+0.01*sin(angle), birdCenterColor, birdCuterColor, 1.625 * M_PI, 1.9 * M_PI, false);
+
 		}
 	}
 	glutSwapBuffers();
@@ -411,6 +421,7 @@ void think(void)
 		activeSnow++;
 		snow[activeSnow].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[activeSnow].size;
 	}
+	angle += 0.01;
 	for (int i = 0; i < activeSnow; i++) {
 		snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
 		int heightIndex = round((snow[i].location.x+1) * 100);
