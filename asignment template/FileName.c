@@ -56,7 +56,7 @@ void idle(void);
 void mouse(int button, int state, int x, int y);
 
 void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[3], float outerColor[3], float startPoint, float endPoint, bool background);
-
+void rotate(float angle, float xInitial, float yInitial, float* xFinal, float* yFinal);
 /******************************************************************************
  * Animation-Specific Function Prototypes (add your own here)
  ******************************************************************************/
@@ -104,7 +104,7 @@ float snowHeight[3][200];
 
 bird birds[50];
 int activeBird[50];
-float angle = +M_PI / 4;
+float angle = M_PI/4;
 
 int framesPassed = 1;
 int activeSnow = 50;
@@ -214,26 +214,32 @@ void display(void)
 		if (activeBird[i] == 1) {
 			glPointSize(10);
 			glColor3f(0, 0, 0);
+			float x, y;
 
 			float birdCenterColor[3] = { 0.2118, 0.1529, 0 };
-			float birdOuterColor[3] = { 0.2118, 0.1529, 0 };
+			float birdOuterColor[3] = {0.2118, 0.1529, 0};
 			glColor3f(0.2118, 0.1529, 0);
 
 			
 			glBegin(GL_POLYGON);
-				glVertex2f(birds[i].location.x + 0.05 * cos(angle), birds[i].location.y + 0.025 * sin(angle));
-				glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI / 2), birds[i].location.y + 0.025 * sin(angle + M_PI / 2));
-				glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI), birds[i].location.y + 0.025 * sin(angle + M_PI));
-				glVertex2f(birds[i].location.x + 0.05 * cos(angle + M_PI * 1.5), birds[i].location.y + 0.025 * sin(angle + M_PI * 1.5));
+				rotate(0, 0.035355, 0.017678, &x, &y);
+				glVertex2f(birds[i].location.x + x, birds[i].location.y + y);
+				glVertex2f(birds[i].location.x - x, birds[i].location.y + y);
+				glVertex2f(birds[i].location.x - x, birds[i].location.y - y);
+				glVertex2f(birds[i].location.x + x, birds[i].location.y - y);
 			glEnd();
-
+			
 			glBegin(GL_POLYGON);
-				glVertex2f(birds[i].location.x-0.011 + 0.0275 * cos(angle), birds[i].location.y + 0.025 + 0.015 * sin(angle));
-				glVertex2f(birds[i].location.x - 0.011 + 0.0275 * cos(angle + M_PI / 2), birds[i].location.y + 0.025 + 0.015 * sin(angle + M_PI / 2));
-				glVertex2f(birds[i].location.x - 0.011 + 0.0275 * cos(angle + M_PI), birds[i].location.y + 0.025 + 0.015 * sin(angle + M_PI));
-				glVertex2f(birds[i].location.x - 0.011 + 0.0275 * cos(angle + M_PI * 1.5), birds[i].location.y + 0.025 + 0.015 * sin(angle + M_PI * 1.5));
+				rotate(0, 0.008445, 0.035606602, &x, &y);
+				glVertex2f(birds[i].location.x + x, birds[i].location.y + y );
+				rotate(0, -0.030445, 0.035606602, &x, &y);
+				glVertex2f(birds[i].location.x +x, birds[i].location.y +y);
+				rotate(0, -0.030445, 0.014393398, &x, &y);
+				glVertex2f(birds[i].location.x +x, birds[i].location.y + y);
+				rotate(0, 0.008445, 0.014393398, &x, &y);
+				glVertex2f(birds[i].location.x + x, birds[i].location.y + y);
 			glEnd();
-
+			
 			glBegin(GL_TRIANGLES);
 				glVertex2f(birds[i].location.x +0.005 , birds[i].location.y + 0.045);
 				glVertex2f(birds[i].location.x +0.005, birds[i].location.y + 0.015);
@@ -260,7 +266,6 @@ void display(void)
 				glVertex2f(birds[i].location.x + 0.05, birds[i].location.y + 0.015);
 			glEnd();
 			
-			circle(0.005, birds[i].location.x - 0.0625, birds[i].location.y + 0.007375, birds[i].location.x -0.0625, birds[i].location.y + 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
 			glBegin(GL_POLYGON);
 				glVertex2f(birds[i].location.x - 0.05, birds[i].location.y + 0.02);
 				glVertex2f(birds[i].location.x - 0.06, birds[i].location.y + 0.02);
@@ -283,6 +288,7 @@ void display(void)
 			glEnd();
 			glColor3f(0.2118, 0.1529, 0);
 
+			circle(0.005, birds[i].location.x - 0.0625, birds[i].location.y + 0.007375, birds[i].location.x - 0.0625, birds[i].location.y + 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
 			circle(0.00375, birds[i].location.x - 0.065, birds[i].location.y + 0.02375, birds[i].location.x - 0.065, birds[i].location.y + 0.02375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
 			circle(0.0275, birds[i].location.x -0.005, birds[i].location.y + (0.035 / sin(M_PI / 4)) * sin(angle), birds[i].location.x + (0.005 / sin(M_PI / 4)) * cos(angle), birds[i].location.y + (0.03 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.25 * M_PI, 2.15 * M_PI, false);
 			circle(0.03, birds[i].location.x - 0.035, birds[i].location.y + 0.05, birds[i].location.x - 0.05, birds[i].location.y + 0.01, birdCenterColor, birdOuterColor, 1 * M_PI, 1.17 * M_PI, false);
@@ -293,12 +299,17 @@ void display(void)
 			circle(0.02, birds[i].location.x + (0.015 / sin(M_PI / 4)) * cos(angle), birds[i].location.y - (0.003 / sin(M_PI / 4)) * sin(angle), birds[i].location.x + (0.015 / sin(M_PI / 4)) * cos(angle), birds[i].location.y - (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, M_PI - M_PI / 4, 1 * M_PI - M_PI / 4 + angle, false);
 			float eyeColour[3] = { 1,1,1 };
 			circle(0.004, birds[i].location.x + 0.045, birds[i].location.y + 0.025, birds[i].location.x +0.045, birds[i].location.y + 0.025, eyeColour, eyeColour, 0 * M_PI, 2 * M_PI, false);
-
+			
 
 
 		}
 	}
 	glutSwapBuffers();
+}
+
+void rotate(float angle, float xInitial, float yInitial, float* xFinal, float* yFinal) {
+	*xFinal = xInitial * cos(angle) - yInitial * sin(angle);
+	*yFinal = xInitial * sin(angle) + yInitial * cos(angle);
 }
 
 void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[3], float outerColor[3], float startPoint, float endPoint, bool background){
@@ -362,7 +373,7 @@ void birdfunc(void) {
 			birds[i].formula.B = (p2y - birds[i].formula.Y2) / pow((1 - birds[i].formula.X2), 2);
 			birds[i].location.x = -1;
 			birds[i].location.y = p1y;
-			birds[i].dx = ((((float)rand() / RAND_MAX) * 0.05f) + 0.008f);
+			birds[i].dx = ((((float)rand() / RAND_MAX) * 0.02f) + 0.0055f);
 			break;
 		} 
 	}
@@ -454,7 +465,7 @@ void init(void)
 		snowHeight[0][i] = snowHeight[1][i] = snowHeight[2][i] = lanscape[i]-0.003;
 	}
 
-	// test to devlop bird
+	//test to devlop bird
 	birds[0].formula.X2 = 0;
 	birds[0].formula.Y2 = 0.3;
 	birds[0].formula.A = 1;
