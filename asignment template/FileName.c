@@ -43,7 +43,8 @@ const unsigned int FramePixels = 700;
  // Note: USE ONLY LOWERCASE CHARACTERS HERE. The keyboard handler provided converts all
  // characters typed by the user to lowercase, so the SHIFT key is ignored.
 
-#define KEY_EXIT			27 // Escape key.
+#define KEY_Q			113 // q key.
+#define KEY_S			115 // q key.
 
 /******************************************************************************
  * GLUT Callback Prototypes
@@ -90,6 +91,7 @@ typedef struct {
 	int landTime;
 	int lifetime;
 	int depth;
+	bool active;
 }Partical;
 
 typedef struct {
@@ -102,13 +104,14 @@ Partical  snow[10000];
 float lanscape[200];
 float snowHeight[3][200];
 
-bird birds[50];
-int activeBird[50];
+bird birds[80];
+int activeBird[80];
+int totalActiveBirds = 0;
 float angle = M_PI/4;
 
 int framesPassed = 1;
-int activeSnow = 50;
-
+int totalSnow = 50;
+bool snowfall = true;
 GLfloat clickpos[2] = { 0,0 };
  /******************************************************************************
   * Entry Point (don't put anything except the main function here)
@@ -158,13 +161,22 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glBegin(GL_QUAD_STRIP); // sky to be invert of the ground
+	glColor3f(0.647, 0.898, 0.9686274);
+	int num = 0;
+	for (float i = -1; i < 1; i += 0.0101) {
+		glVertex2f(i, 1);
+		glVertex2f(i, lanscape[num]);
+		num++;
+	}
+	glEnd();
 	bool firstPass; // variable so that you can run some things only once to improve eficency for example background calculation in circle function
 	if (framesPassed == 1) { firstPass = true; }
 	else { firstPass = false; }
-	glClearColor(0.647, 0.898, 0.9686274, 1);
+
 	glColor3f(1, 1, 1);
-	for (int i = 0; i < activeSnow; i++) {
-		if (snow[i].depth <= 1) {
+	for (int i = 0; i < 10000; i++) {
+		if (snow[i].depth <= 1 && snow[i].active) {
 			glPointSize(snow[i].size);
 			glBegin(GL_POINTS);
 			glVertex2f(snow[i].location.x, snow[i].location.y);
@@ -174,13 +186,15 @@ void display(void)
 
 	glColor3f(0.298, 0.6902, 0.0196);
 	glBegin(GL_QUAD_STRIP);
-	int num = 0;
+	num = 0;
 	for (float i = -1; i < 1; i += 0.0101) {
 		glVertex2f(i, -1);
 		glVertex2f(i, lanscape[num]);
 		num++;
 	}
 	glEnd();
+
+	
 
 	float snowmanCenterColor[3] = { 1,1,1 };
 	float snowmanCuterColor[3] = { 0.6902, 0.83137, 0.8196 };
@@ -190,8 +204,8 @@ void display(void)
 
 	// makes snow of depth level 2 render infront of objects
 	glColor3f(1, 1, 1);
-	for (int i = 0; i < activeSnow; i++) {
-		if (snow[i].depth == 2) {
+	for (int i = 0; i < 10000; i++) {
+		if (snow[i].depth == 2 && snow[i].active) {
 			glPointSize(snow[i].size); 
 			glBegin(GL_POINTS); 
 			glVertex2f(snow[i].location.x, snow[i].location.y); 
@@ -364,14 +378,15 @@ void birdfunc(void) {
 	p2y = p2y * ((clickpos[0] - 1)*-1);
 	if (rand() % 2 == 1) { p2y = -p2y; }
 	p2y += clickpos[1];
-	for (int i = 0; i < 50; i++) { 
+	for (int i = 0; i < 80; i++) { 
 		if (activeBird[i] == 0) { 
+			totalActiveBirds++;
 			activeBird[i] = 1;
 			birds[i].formula.X2 = clickpos[0]; 
 			birds[i].formula.Y2 = clickpos[1];
 			birds[i].formula.A = (p1y - birds[i].formula.Y2) / pow((-1 - birds[i].formula.X2),2);
 			birds[i].formula.B = (p2y - birds[i].formula.Y2) / pow((1 - birds[i].formula.X2), 2);
-			birds[i].location.x = -1;
+			birds[i].location.x = -1.1;
 			birds[i].location.y = p1y;
 			birds[i].dx = ((((float)rand() / RAND_MAX) * 0.02f) + 0.0055f);
 			break;
@@ -388,8 +403,12 @@ void keyPressed(unsigned char key, int x, int y)
 			Rather than using literals (e.g. "d" for diagnostics), create a new KEY_
 			definition in the "Keyboard Input Handling Setup" section of this file.
 		*/
-	case KEY_EXIT:
+	case KEY_Q:
 		exit(0);
+		break;
+	case KEY_S:
+		if (snowfall == true) {snowfall = false;}
+		else { snowfall = true; }
 		break;
 	}
 }
@@ -434,21 +453,23 @@ void init(void)
 {
 	srand((unsigned)time(NULL));
 
-	for (int i = 0; i <= activeSnow; i++) {
+	for (int i = 0; i <= totalSnow; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 		snow[i].location.y = 1.0f;
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) +1.5f;
 		snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f)+0.01f)* snow[i].size;
 		snow[i].landTime = 0;
 		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
+		snow[i].active = true;
 	}
-	for (int i = activeSnow+1; i < 10000; i++) {
+	for (int i = totalSnow+1; i < 10000; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 		snow[i].location.y = 1.05f; // off render untill active
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
 		snow[i].dy = 0; // initial velocity to 0 untill activated
 		snow[i].landTime = 0; //shows it has not landed yet
 		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
+		snow[i].active = false;
 	}
 
 	//generating random lanscape where it is random but dosent have any to steep changes by comparing heigh to previous height
@@ -465,7 +486,7 @@ void init(void)
 		snowHeight[0][i] = snowHeight[1][i] = snowHeight[2][i] = lanscape[i]-0.003;
 	}
 
-	//test to devlop bird
+	/*//test to devlop bird
 	birds[0].formula.X2 = 0;
 	birds[0].formula.Y2 = 0.3;
 	birds[0].formula.A = 1;
@@ -473,7 +494,7 @@ void init(void)
 	birds[0].location.x = 0;
 	birds[0].location.y = 0.3;
 	birds[0].dx = 0;
-	activeBird[0] = 1;
+	activeBird[0] = 1;*/
 	 
 }
 
@@ -489,45 +510,64 @@ void think(void)
 {
 	//srand((unsigned)time(NULL));
 	framesPassed++;
-	if (activeSnow < 10000 && framesPassed%2 == 0) {
-		activeSnow++;
-		snow[activeSnow].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[activeSnow].size;
-	}
-	//angle += 0.01;
-	for (int i = 0; i < activeSnow; i++) {
-		snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
-		int heightIndex = round((snow[i].location.x+1) * 100);
-		if (heightIndex > 199) { heightIndex = 199; } // stops error where they round to the next one and go lower than the lanscape
-		if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight [snow[i].depth][heightIndex] && snow[i].landTime == 0) {
-			snow[i].landTime = framesPassed;
-			snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
-			snow[i].dy = 0;
-			snow[i].lifetime = rand() % 3500 + 2000;
-			continue;
-		}
-		else if (snow[i].dy == 0 && (snow[i].location.y ) > snowHeight[snow[i].depth][heightIndex]) {
-			snow[i].location.y = snowHeight[snow[i].depth][heightIndex];
-		}
-		if ( framesPassed >  snow[i].landTime + snow[i].lifetime && snow[i].landTime != 0) {
-			for (int x = 0; x < activeSnow; x++) {
-				if ((round((snow[x].location.x + 1) * 100) == round((snow[i].location.x + 1) * 100) && snow[x].landTime !=0) && snow[x].location.y > snow[i].location.y && snow[x].depth == snow[i].depth) {
-					snow[x].location.y -= snow[i].size / FramePixels;
+
+	if (snowfall) {
+		if (totalSnow != 10000) {
+			for (int i = 0; i < 10000; i++) {
+				if (snow[i].active == false) {
+					totalSnow++;
+					snow[i].active = true;
+					snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
+					break;
 				}
 			}
-			snowHeight[snow[i].depth][heightIndex] -= snow[i].size / FramePixels;
-			snow[i].landTime = 0;
-			snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
-			snow[i].location.y = 1.0f;
-			snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
-			snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
-			snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 		}
 	}
 
-	for (int i = 0; i < 50; i++) {
+	//angle += 0.01;
+	for (int i = 0; i < 10000; i++) {
+		if (snow[i].active) {
+			snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
+			int heightIndex = round((snow[i].location.x + 1) * 100);
+			if (heightIndex > 199) { heightIndex = 199; } // stops error where they round to the next one and go lower than the lanscape
+			if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[snow[i].depth][heightIndex] && snow[i].landTime == 0) {
+				snow[i].landTime = framesPassed;
+				snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
+				snow[i].dy = 0;
+				snow[i].lifetime = rand() % 3500 + 2000;
+				continue;
+			}
+			else if (snow[i].dy == 0 && (snow[i].location.y) > snowHeight[snow[i].depth][heightIndex]) {
+				snow[i].location.y = snowHeight[snow[i].depth][heightIndex];
+			}
+			if (framesPassed > snow[i].landTime + snow[i].lifetime && snow[i].landTime != 0) {
+				for (int x = 0; x < 10000; x++) {
+					if ((round((snow[x].location.x + 1) * 100) == round((snow[i].location.x + 1) * 100) && snow[x].landTime != 0) && snow[x].location.y > snow[i].location.y && snow[x].depth == snow[i].depth) {
+						snow[x].location.y -= snow[i].size / FramePixels;
+					}
+				}
+				snowHeight[snow[i].depth][heightIndex] -= snow[i].size / FramePixels;
+				snow[i].landTime = 0;
+				snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
+				snow[i].location.y = 1.05f;
+				snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
+
+				snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
+				if (snowfall == true) {
+					snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
+				}
+				else {
+					snow[i].active = false;
+					snow[i].dy = 0;
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < 80; i++) {
 		if (activeBird[i] == 1) {
 			birds[i].location.x += birds[i].dx;
-			if (birds[i].location.x > 1) { activeBird[i] = 0; continue;}
+			if (birds[i].location.x > 1.1) { activeBird[i] = 0; continue;}
 			if (birds[i].location.x <= birds[i].formula.X2) {
 				birds[i].location.y = birds[i].formula.A * pow((birds[i].location.x - birds[i].formula.X2), 2) + birds[i].formula.Y2;
 			}
