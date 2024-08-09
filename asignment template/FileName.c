@@ -56,6 +56,7 @@ void keyPressed(unsigned char key, int x, int y);
 void idle(void);
 void mouse(int button, int state, int x, int y);
 
+void printText(char text[], float x, float y);
 void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[3], float outerColor[3], float startPoint, float endPoint, bool background);
 void rotate(float angle, float xInitial, float yInitial, float* xFinal, float* yFinal);
 /******************************************************************************
@@ -100,17 +101,19 @@ typedef struct {
 	float dx;
 }bird;
 
-Partical  snow[10000];
+Partical  snow[4000];
 float lanscape[200];
 float snowHeight[3][200];
+int highestActiveSnow = 50;
 
-bird birds[80];
-int activeBird[80];
+bird birds[10];
+int activeBird[10];
 int totalActiveBirds = 0;
 float angle = M_PI/4;
 
 int framesPassed = 1;
 int totalSnow = 50;
+int previousSnowActivation = 49;
 bool snowfall = true;
 GLfloat clickpos[2] = { 0,0 };
  /******************************************************************************
@@ -161,21 +164,19 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glBegin(GL_QUAD_STRIP); // sky to be invert of the ground
-	glColor3f(0.647, 0.898, 0.9686274);
-	int num = 0;
-	for (float i = -1; i < 1; i += 0.0101) {
-		glVertex2f(i, 1);
-		glVertex2f(i, lanscape[num]);
-		num++;
-	}
+	glBegin(GL_POLYGON); // sky to be invert of the ground
+		glColor3f(0.647, 0.898, 0.9686274);
+		glVertex2f(-1, -1);
+		glVertex2f(-1, 1);
+		glVertex2f(1, 1);
+		glVertex2f(1, -1);
 	glEnd();
 	bool firstPass; // variable so that you can run some things only once to improve eficency for example background calculation in circle function
 	if (framesPassed == 1) { firstPass = true; }
 	else { firstPass = false; }
-
+	
 	glColor3f(1, 1, 1);
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < highestActiveSnow; i++) {
 		if (snow[i].depth <= 1 && snow[i].active) {
 			glPointSize(snow[i].size);
 			glBegin(GL_POINTS);
@@ -183,10 +184,10 @@ void display(void)
 			glEnd();
 		}
 	}
-
+	
 	glColor3f(0.298, 0.6902, 0.0196);
 	glBegin(GL_QUAD_STRIP);
-	num = 0;
+	int num = 0;
 	for (float i = -1; i < 1; i += 0.0101) {
 		glVertex2f(i, -1);
 		glVertex2f(i, lanscape[num]);
@@ -202,29 +203,8 @@ void display(void)
 	circle(0.12, 0, lanscape[100] + 0.36, 0, lanscape[100] + 0.36, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 	circle(0.07, 0, lanscape[100] + 0.54, 0, lanscape[100] + 0.54, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 
-	// makes snow of depth level 2 render infront of objects
-	glColor3f(1, 1, 1);
-	for (int i = 0; i < 10000; i++) {
-		if (snow[i].depth == 2 && snow[i].active) {
-			glPointSize(snow[i].size); 
-			glBegin(GL_POINTS); 
-			glVertex2f(snow[i].location.x, snow[i].location.y); 
-			glEnd(); 
-		}
-	}
 
-
-	glColor3f(0.298, 0, 0);
-	
-	char text[] = "bird";
-	for (int i = 0; i < 4; i++) {
-		glRasterPos2f(-0.5, 0.8);
-		
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, "h");
-	}
-	
-
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < 10; i++) {
 		if (activeBird[i] == 1) {
 			glPointSize(10);
 			glColor3f(0, 0, 0);
@@ -313,12 +293,48 @@ void display(void)
 			circle(0.02, birds[i].location.x + (0.015 / sin(M_PI / 4)) * cos(angle), birds[i].location.y - (0.003 / sin(M_PI / 4)) * sin(angle), birds[i].location.x + (0.015 / sin(M_PI / 4)) * cos(angle), birds[i].location.y - (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, M_PI - M_PI / 4, 1 * M_PI - M_PI / 4 + angle, false);
 			float eyeColour[3] = { 1,1,1 };
 			circle(0.004, birds[i].location.x + 0.045, birds[i].location.y + 0.025, birds[i].location.x +0.045, birds[i].location.y + 0.025, eyeColour, eyeColour, 0 * M_PI, 2 * M_PI, false);
-			
-
 
 		}
+
+		// makes snow of depth level 2 render infront of objects	
+		glColor3f(1, 1, 1);
+		for (int i = 0; i < highestActiveSnow; i++) {
+			if (snow[i].depth == 2 && snow[i].active) {
+				glPointSize(snow[i].size);
+				glBegin(GL_POINTS);
+				glVertex2f(snow[i].location.x, snow[i].location.y);
+				glEnd();
+			}
+		}
+		
+		glColor3f(1, 0, 0);
+		printText("Number of Snow Particles:", -0.95, 0.85); // prints the snow amount
+		for (int i = 0; i < 4; i++) {
+			glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Snow Particles:") + i), 0.85);
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, (totalSnow / (int)pow(10, 3 - i)) % 10 + 48);
+		}
+		printText("/4000", -0.95 + (strlen("Number of Snow Particles:4000")) * 0.0225, 0.85);
+
+		printText("Number of Birds:", -0.95, 0.8);// prints the bird amount
+		for (int i = 0; i < 2; i++) {
+			glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Birds:") + i), 0.8);
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, (totalActiveBirds / (int)pow(10, 1 - i)) % 10 + 48);
+		}
+		printText("/10", -0.95 + (strlen("Number of Birds:10")) * 0.0225, 0.8);
+
+		printText("Press q to exit", -0.95, 0.75);// prints the comands
+		printText("Press s to stop snow", -0.95, 0.7);// prints the comands
+		printText("Click to summon bird", -0.95, 0.65);// prints the comands
+	
 	}
 	glutSwapBuffers();
+}
+
+void printText(char text[],float x, float y) {
+	for (int i = 0; i < strlen(text); i++) {
+		glRasterPos2f(x + 0.0225 * i, y);
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, text[i]);
+	}
 }
 
 void rotate(float angle, float xInitial, float yInitial, float* xFinal, float* yFinal) {
@@ -378,7 +394,7 @@ void birdfunc(void) {
 	p2y = p2y * ((clickpos[0] - 1)*-1);
 	if (rand() % 2 == 1) { p2y = -p2y; }
 	p2y += clickpos[1];
-	for (int i = 0; i < 80; i++) { 
+	for (int i = 0; i < 10; i++) { 
 		if (activeBird[i] == 0) { 
 			totalActiveBirds++;
 			activeBird[i] = 1;
@@ -408,7 +424,13 @@ void keyPressed(unsigned char key, int x, int y)
 		break;
 	case KEY_S:
 		if (snowfall == true) {snowfall = false;}
-		else { snowfall = true; }
+		else { 
+			snowfall = true; 
+			previousSnowActivation = 0; 
+			for (int i = 3999; i > 0; i--) {
+				if (snow[i].active) { highestActiveSnow = i; }
+			}
+		}
 		break;
 	}
 }
@@ -429,6 +451,7 @@ void idle(void)
 	{
 		// This frame took less time to render than the ideal FRAME_TIME: we'll suspend this thread for the remaining time,
 		// so we're not taking up the CPU until we need to render another frame.
+		printf("skip");
 		unsigned int timeLeft = FRAME_TIME - frameTimeElapsed;
 		Sleep(timeLeft);
 	}
@@ -462,7 +485,7 @@ void init(void)
 		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 		snow[i].active = true;
 	}
-	for (int i = totalSnow+1; i < 10000; i++) {
+	for (int i = totalSnow+1; i < 4000; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 		snow[i].location.y = 1.05f; // off render untill active
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
@@ -510,14 +533,17 @@ void think(void)
 {
 	//srand((unsigned)time(NULL));
 	framesPassed++;
-
+	printf("think");
+	
 	if (snowfall) {
-		if (totalSnow != 10000) {
-			for (int i = 0; i < 10000; i++) {
+		if (totalSnow != 4000) {
+			for (int i = previousSnowActivation; i < 4000; i++) {
 				if (snow[i].active == false) {
 					totalSnow++;
 					snow[i].active = true;
 					snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
+					previousSnowActivation = i;
+					if (i > highestActiveSnow) { highestActiveSnow = i; }
 					break;
 				}
 			}
@@ -525,8 +551,11 @@ void think(void)
 	}
 
 	//angle += 0.01;
-	for (int i = 0; i < 10000; i++) {
+	int snowProcessed = 0;
+	for (int i = 0; i < highestActiveSnow; i++) {
+		if (snowProcessed == totalSnow) { break;}
 		if (snow[i].active) {
+			snowProcessed++;
 			snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
 			int heightIndex = round((snow[i].location.x + 1) * 100);
 			if (heightIndex > 199) { heightIndex = 199; } // stops error where they round to the next one and go lower than the lanscape
@@ -534,14 +563,14 @@ void think(void)
 				snow[i].landTime = framesPassed;
 				snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
 				snow[i].dy = 0;
-				snow[i].lifetime = rand() % 3500 + 2000;
+				snow[i].lifetime = rand() % 1500 + 1000;
 				continue;
 			}
 			else if (snow[i].dy == 0 && (snow[i].location.y) > snowHeight[snow[i].depth][heightIndex]) {
 				snow[i].location.y = snowHeight[snow[i].depth][heightIndex];
 			}
 			if (framesPassed > snow[i].landTime + snow[i].lifetime && snow[i].landTime != 0) {
-				for (int x = 0; x < 10000; x++) {
+				for (int x = 0; x < highestActiveSnow; x++) {
 					if ((round((snow[x].location.x + 1) * 100) == round((snow[i].location.x + 1) * 100) && snow[x].landTime != 0) && snow[x].location.y > snow[i].location.y && snow[x].depth == snow[i].depth) {
 						snow[x].location.y -= snow[i].size / FramePixels;
 					}
@@ -559,15 +588,16 @@ void think(void)
 				else {
 					snow[i].active = false;
 					snow[i].dy = 0;
+					totalSnow--;
 				}
 			}
 		}
 	}
-
-	for (int i = 0; i < 80; i++) {
+	
+	for (int i = 0; i < 10; i++) {
 		if (activeBird[i] == 1) {
 			birds[i].location.x += birds[i].dx;
-			if (birds[i].location.x > 1.1) { activeBird[i] = 0; continue;}
+			if (birds[i].location.x > 1.1) { activeBird[i] = 0; totalActiveBirds--; continue; }
 			if (birds[i].location.x <= birds[i].formula.X2) {
 				birds[i].location.y = birds[i].formula.A * pow((birds[i].location.x - birds[i].formula.X2), 2) + birds[i].formula.Y2;
 			}
