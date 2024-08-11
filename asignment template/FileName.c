@@ -263,6 +263,14 @@ void display(void)
 		glVertex2f(0.645, lanscape[145] + 0.78 -0.85);
 		glVertex2f(0.505, lanscape[145] + 0.78 -0.69);
 	glEnd();
+	if (fire == true && lightningSpawn + 6 < framesPassed) {
+		circleCenter[0] = 1;
+		circleCenter[1] = 0;
+		circleCenter[2] = 0;
+		glColor3f(1, 0, 0);
+		circle(0.05, 0.53, lanscape[145], 0.53, lanscape[145], circleCenter, circleCenter, 0, 2* M_PI, false);
+
+	}
 	circle(0.0235, 0.522, lanscape[145] + 0.78 -0.72, 0.5175, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
 		glColor3f(0.388235, 0.2, 0.0235);
@@ -745,7 +753,21 @@ void think(void)
 				snow[i].landTime = framesPassed;
 				snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
 				snow[i].dy = 0;
-				snow[i].lifetime = rand() % 3500 + 2000;
+				if (fire == true && lightningSpawn + 6 < framesPassed) {
+					if (snow[i].location.x > 0.33 && snow[i].location.x < 0.73) {
+						snow[i].lifetime = 0;
+					}
+					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) {
+						snow[i].lifetime = (rand() % 3500 + 2000)* (snow[i].location.x-0.38) *-1.5;
+					}
+					else if (snow[i].location.x >= 0.73) {
+						snow[i].lifetime = (rand() % 3500 + 2000) * ((snow[i].location.x - 0.68) * 1.5);
+					}else{ 
+						snow[i].lifetime = rand() % 3500 + 2000; 
+					}
+				}else{ 
+					snow[i].lifetime = rand() % 3500 + 2000; 
+				}
 				continue;
 			}
 			else if (snow[i].dy == 0 && (snow[i].location.y) > snowHeight[snow[i].depth][heightIndex]) {
@@ -771,6 +793,21 @@ void think(void)
 					snow[i].active = false;
 					snow[i].dy = 0;
 					totalSnow--;
+				}
+			}
+		}
+	}
+	if (fire == true && lightningSpawn + 6 == framesPassed){
+		for (int i = 0; i <= 10000; i++) {
+			if (snow[i].active) {
+				if (snow[i].location.x > 0.33 && snow[i].location.x < 0.73) {
+					snow[i].lifetime = 0;
+				}
+				else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) {
+					snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.38) * -1.5));
+				}
+				else if (snow[i].location.x >= 0.73) {
+					snow[i].lifetime = (snow[i].lifetime  * ((snow[i].location.x - 0.68) * 1.5));
 				}
 			}
 		}
