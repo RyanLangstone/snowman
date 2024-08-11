@@ -161,10 +161,24 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glBegin(GL_QUAD_STRIP); // sky to be invert of the ground
-	glColor3f(0.647, 0.898, 0.9686274);
+	glColor3f(0.298, 0.6902, 0.0196);
+	glBegin(GL_QUAD_STRIP);
 	int num = 0;
 	for (float i = -1; i < 1; i += 0.0101) {
+		glVertex2f(i, -1);
+		glVertex2f(i, lanscape[num]);
+		num++;
+	}
+	glEnd();
+	float circleCenter[3] = { 0.16863,0.117647,0.02353 };
+	float circleOuter[3] = { 0.25098, 0.17255, 0.02353 };
+	circle(0.2, 0.53, lanscape[145], 0.53, lanscape[145], circleCenter, circleOuter, 0, 2 * M_PI, false);
+
+
+	glBegin(GL_QUAD_STRIP); // sky to be invert of the ground
+	glColor3f(0.647, 0.898, 0.9686274);
+	num = 0;
+	for (float i = -1; i <= 1; i += 0.0101) {
 		glVertex2f(i, 1);
 		glVertex2f(i, lanscape[num]);
 		num++;
@@ -184,23 +198,15 @@ void display(void)
 		}
 	}
 
-	glColor3f(0.298, 0.6902, 0.0196);
-	glBegin(GL_QUAD_STRIP);
-	num = 0;
-	for (float i = -1; i < 1; i += 0.0101) {
-		glVertex2f(i, -1);
-		glVertex2f(i, lanscape[num]);
-		num++;
-	}
-	glEnd();
+
 
 
 
 	float snowmanCenterColor[3] = { 1,1,1 };
 	float snowmanCuterColor[3] = { 0.6902, 0.83137, 0.8196 };
-	circle(0.15, -0.5, lanscape[100] + 0.1, -0.5, lanscape[100] + 0.1, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.12, -0.5, lanscape[100] + 0.36, -0.5, lanscape[100] + 0.36, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.07, -0.5, lanscape[100] + 0.54, -0.5, lanscape[100] + 0.54, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.15, -0.5, lanscape[50] + 0.1, -0.5, lanscape[50] + 0.1, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.12, -0.5, lanscape[50] + 0.36, -0.5, lanscape[50] + 0.36, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.07, -0.5, lanscape[50] + 0.54, -0.5, lanscape[50] + 0.54, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 
 	// makes snow of depth level 2 render infront of objects
 	glColor3f(1, 1, 1);
@@ -214,7 +220,64 @@ void display(void)
 	}
 
 
-	glColor3f(0.298, 0, 0);
+	float logCenterColor[3] = { 0.6392, 0.3412, 0.0627 };
+	float logOuterColor[3] = { 0.388235, 0.2, 0.0235 };
+	circle(0.05, 0.5, lanscape[145] + 0.78 -0.785, 0.46, lanscape[145] + 0.78 -0.765, logCenterColor, logOuterColor, 1.5 * M_PI, 1.815 * M_PI, true);
+	glBegin(GL_QUAD_STRIP);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.63, lanscape[145] + 0.78 -0.825); //lanscape[145]+0.79
+		glVertex2f(0.45, lanscape[145] + 0.78 -0.785); //lanscape[150]-0.09
+		glColor3f(0.6392, 0.3412, 0.0627);
+		glVertex2f(0.64, lanscape[145] + 0.78 -0.80); //lanscape[150]-0.05
+		glVertex2f(0.46, lanscape[145] + 0.78 -0.765);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.65, lanscape[145] + 0.78 -0.775);
+		glVertex2f(0.47, lanscape[145] + 0.78 -0.745);
+	glEnd();
+	circle(0.023, 0.558, lanscape[145] + 0.78 -0.716, 0.56, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.7 * M_PI, 2.45 * M_PI, true);
+	glBegin(GL_QUAD_STRIP);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.43, lanscape[145] + 0.78 -0.845);
+		glVertex2f(0.54, lanscape[145] + 0.78 -0.7);
+		glColor3f(0.6392, 0.3412, 0.0627);
+		glVertex2f(0.455, lanscape[145] + 0.78 -0.8525);
+		glVertex2f(0.56, lanscape[145] + 0.78 -0.705);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.48, lanscape[145] + 0.78 -0.86);
+		glVertex2f(0.58, lanscape[145] + 0.78 -0.71);
+	glEnd();
+	circle(0.0235, 0.498, lanscape[145] + 0.78 -0.713, 0.49, lanscape[145] + 0.78 -0.7, logCenterColor, logOuterColor, 1.5 * M_PI, 2.1 * M_PI, true);
+	glBegin(GL_QUAD_STRIP);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.6, lanscape[145] + 0.78 -0.87);
+		glVertex2f(0.475, lanscape[145] + 0.78 -0.71);
+		glColor3f(0.6392, 0.3412, 0.0627);
+		glVertex2f(0.6225, lanscape[145] + 0.78 -0.86);
+		glVertex2f(0.49, lanscape[145] + 0.78 -0.7);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.645, lanscape[145] + 0.78 -0.85);
+		glVertex2f(0.505, lanscape[145] + 0.78 -0.69);
+	glEnd();
+	circle(0.0235, 0.522, lanscape[145] + 0.78 -0.72, 0.5175, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, true);
+	glBegin(GL_QUAD_STRIP);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.51, lanscape[145] + 0.78 -0.89);
+		glVertex2f(0.50, lanscape[145] + 0.78 -0.71);
+		glColor3f(0.6392, 0.3412, 0.0627);
+		glVertex2f(0.535, lanscape[145] + 0.78 -0.885);
+		glVertex2f(0.5175, lanscape[145] + 0.78 -0.705);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.56, lanscape[145] + 0.78 -0.88);
+		glVertex2f(0.535, lanscape[145] + 0.78 -0.7);
+	glEnd();
+	float stoneCenterColor[3] = { 0.77255, 0.77255, 0.77255 };
+	float stoneOuterColor[3] = { 0.67843, 0.65098, 0.62745 };
+	circle(0.02, 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.5 * M_PI), 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.5* M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+	circle(0.02, 0.53 + 0.15 * sin(1 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1 * M_PI), 0.53 + 0.15 * sin(1 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+	circle(0.02, 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.5 * M_PI), 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.5 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+	circle(0.02, 0.53 + 0.15 * sin(0.75 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.75 * M_PI), 0.53 + 0.15 * sin(0.75 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.75 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+	circle(0.02, 0.53 + 0.15 * sin(1.25 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.25 * M_PI), 0.53 + 0.15 * sin(1.25 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.25 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+
 
 	char text[] = "bird";
 	for (int i = 0; i < 4; i++) {
@@ -324,67 +387,22 @@ void display(void)
 	printText("/10000", -0.95 + (strlen("Number of Snow Particles:4000")) * 0.0225, 0.85);
 
 	printText("Number of Birds:", -0.95, 0.8);// prints the bird amount
-	for (int i = 0; i < 2; i++) {
-		glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Birds:") + i), 0.8);
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, (totalActiveBirds / (int)pow(10, 1 - i)) % 10 + 48);
+	if (totalActiveBirds < 10) {
+		glRasterPos2f(-0.95 + 0.0225 * strlen("Number of Birds:"), 0.8);
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, totalActiveBirds + 48);
 	}
-	printText("/80", -0.95 + (strlen("Number of Birds:10")) * 0.0225, 0.8);
-
+	else {
+		for (int i = 0; i < 2; i++) {
+			glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Birds:") + i), 0.8);
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, (totalActiveBirds / (int)pow(10, 1 - i)) % 10 + 48);
+		}
+	}
 	printText("Press q to exit", -0.95, 0.75);// prints the comands
 	printText("Press s to stop snow", -0.95, 0.7);// prints the comands
 	printText("Click to summon bird", -0.95, 0.65);// prints the comands
 
 	
-	float logCenterColor[3] = { 0.6392, 0.3412, 0.0627 };
-	float logOuterColor[3] = { 0.388235, 0.2, 0.0235 };
-	circle(0.05, 0.5, -0.76, 0.46, -0.74, logCenterColor, logOuterColor, 1.5 * M_PI, 1.815 * M_PI, true);
-	glBegin(GL_QUAD_STRIP);
-		glColor3f(0.388235, 0.2, 0.0235);
-		glVertex2f(0.63, -0.8); //
-		glVertex2f(0.45, -0.76);
-		glColor3f(0.6392, 0.3412, 0.0627);
-		glVertex2f(0.64, -0.775); //
-		glVertex2f(0.46, -0.74);
-		glColor3f(0.388235, 0.2, 0.0235);
-		glVertex2f(0.65, -0.75);
-		glVertex2f(0.47, -0.72);
-	glEnd();
-	circle(0.023, 0.558, -0.716, 0.56, -0.705, logCenterColor, logOuterColor, 1.7 * M_PI, 2.45 * M_PI, true);
-	glBegin(GL_QUAD_STRIP);
-		glColor3f(0.388235, 0.2, 0.0235);
-		glVertex2f(0.43, -0.845);
-		glVertex2f(0.54, -0.7);
-		glColor3f(0.6392, 0.3412, 0.0627);
-		glVertex2f(0.455, -0.8525);
-		glVertex2f(0.56, -0.705);
-		glColor3f(0.388235, 0.2, 0.0235);
-		glVertex2f(0.48, -0.86);
-		glVertex2f(0.58, -0.71);
-	glEnd();
-	circle(0.0235, 0.498, -0.713, 0.49, -0.7, logCenterColor, logOuterColor, 1.5 * M_PI, 2.1 * M_PI, true);
-	glBegin(GL_QUAD_STRIP);
-		glColor3f(0.388235, 0.2, 0.0235);
-		glVertex2f(0.6, -0.87);
-		glVertex2f(0.475, -0.71);
-		glColor3f(0.6392, 0.3412, 0.0627);
-		glVertex2f(0.6225, -0.86);
-		glVertex2f(0.49, -0.7);
-		glColor3f(0.388235, 0.2, 0.0235);
-		glVertex2f(0.645, -0.85);
-		glVertex2f(0.505, -0.69);
-	glEnd();
-	circle(0.0235, 0.522, -0.72, 0.5175, -0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, true);
-	glBegin(GL_QUAD_STRIP);
-		glColor3f(0.388235, 0.2, 0.0235);
-		glVertex2f(0.51, -0.89);
-		glVertex2f(0.50, -0.71);
-		glColor3f(0.6392, 0.3412, 0.0627);
-		glVertex2f(0.535, -0.885);
-		glVertex2f(0.5175, -0.705);
-		glColor3f(0.388235, 0.2, 0.0235);
-		glVertex2f(0.56, -0.88);
-		glVertex2f(0.535, -0.7);
-	glEnd();
+	
 	
 
 	glutSwapBuffers();
