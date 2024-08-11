@@ -795,23 +795,26 @@ void think(void)
 					totalSnow--;
 				}
 			}
-		}
-	}
-	if (fire == true && lightningSpawn + 6 == framesPassed){
-		for (int i = 0; i <= 10000; i++) {
-			if (snow[i].active) {
-				if (snow[i].location.x > 0.33 && snow[i].location.x < 0.73) {
-					snow[i].lifetime = 0;
-				}
-				else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) {
-					snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.38) * -1.5));
-				}
-				else if (snow[i].location.x >= 0.73) {
-					snow[i].lifetime = (snow[i].lifetime  * ((snow[i].location.x - 0.68) * 1.5));
+			if (fire == true && lightningSpawn + 6 == framesPassed) {
+				if (snow[i].landTime != 0) {
+					if (snow[i].location.x > 0.33 && snow[i].location.x < 0.73) {
+						snowHeight[snow[i].depth][heightIndex] -= snow[i].size / FramePixels;
+						snow[i].landTime = 0;
+						snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
+						snow[i].location.y = 1.05f;
+						snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
+						snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
+						snow[i].active = false;
+						snow[i].dy = 0;
+						totalSnow--;
+					}
+					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.38) * -1.5)); }
+					else if (snow[i].location.x >= 0.73) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.68) * 1.5)); }
 				}
 			}
 		}
 	}
+	
 
 	for (int i = 0; i < 80; i++) {
 		if (activeBird[i] == 1) {
