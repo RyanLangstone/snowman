@@ -43,8 +43,9 @@ const unsigned int FramePixels = 700;
  // Note: USE ONLY LOWERCASE CHARACTERS HERE. The keyboard handler provided converts all
  // characters typed by the user to lowercase, so the SHIFT key is ignored.
 
+#define KEY_F			102 // q key.
 #define KEY_Q			113 // q key.
-#define KEY_S			115 // q key.
+#define KEY_S			115 // s key.
 
 /******************************************************************************
  * GLUT Callback Prototypes
@@ -113,6 +114,10 @@ int framesPassed = 1;
 int totalSnow = 50;
 bool snowfall = true;
 GLfloat clickpos[2] = { 0,0 };
+
+float lightningPoints[5];
+float lightningSpawn = -1000;
+bool fire = true;
 /******************************************************************************
  * Entry Point (don't put anything except the main function here)
  ******************************************************************************/
@@ -222,7 +227,7 @@ void display(void)
 
 	float logCenterColor[3] = { 0.6392, 0.3412, 0.0627 };
 	float logOuterColor[3] = { 0.388235, 0.2, 0.0235 };
-	circle(0.05, 0.5, lanscape[145] + 0.78 -0.785, 0.46, lanscape[145] + 0.78 -0.765, logCenterColor, logOuterColor, 1.5 * M_PI, 1.815 * M_PI, true);
+	circle(0.05, 0.5, lanscape[145] + 0.78 -0.785, 0.46, lanscape[145] + 0.78 -0.765, logCenterColor, logOuterColor, 1.5 * M_PI, 1.815 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
 		glColor3f(0.388235, 0.2, 0.0235);
 		glVertex2f(0.63, lanscape[145] + 0.78 -0.825); //lanscape[145]+0.79
@@ -234,7 +239,7 @@ void display(void)
 		glVertex2f(0.65, lanscape[145] + 0.78 -0.775);
 		glVertex2f(0.47, lanscape[145] + 0.78 -0.745);
 	glEnd();
-	circle(0.023, 0.558, lanscape[145] + 0.78 -0.716, 0.56, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.7 * M_PI, 2.45 * M_PI, true);
+	circle(0.023, 0.558, lanscape[145] + 0.78 -0.716, 0.56, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.7 * M_PI, 2.45 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
 		glColor3f(0.388235, 0.2, 0.0235);
 		glVertex2f(0.43, lanscape[145] + 0.78 -0.845);
@@ -246,7 +251,7 @@ void display(void)
 		glVertex2f(0.48, lanscape[145] + 0.78 -0.86);
 		glVertex2f(0.58, lanscape[145] + 0.78 -0.71);
 	glEnd();
-	circle(0.0235, 0.498, lanscape[145] + 0.78 -0.713, 0.49, lanscape[145] + 0.78 -0.7, logCenterColor, logOuterColor, 1.5 * M_PI, 2.1 * M_PI, true);
+	circle(0.0235, 0.498, lanscape[145] + 0.78 -0.713, 0.49, lanscape[145] + 0.78 -0.7, logCenterColor, logOuterColor, 1.5 * M_PI, 2.1 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
 		glColor3f(0.388235, 0.2, 0.0235);
 		glVertex2f(0.6, lanscape[145] + 0.78 -0.87);
@@ -258,7 +263,7 @@ void display(void)
 		glVertex2f(0.645, lanscape[145] + 0.78 -0.85);
 		glVertex2f(0.505, lanscape[145] + 0.78 -0.69);
 	glEnd();
-	circle(0.0235, 0.522, lanscape[145] + 0.78 -0.72, 0.5175, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, true);
+	circle(0.0235, 0.522, lanscape[145] + 0.78 -0.72, 0.5175, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
 		glColor3f(0.388235, 0.2, 0.0235);
 		glVertex2f(0.51, lanscape[145] + 0.78 -0.89);
@@ -378,7 +383,7 @@ void display(void)
 			
 		}
 	}
-	glColor3f(1, 0, 0);
+	glColor3f(0, 0, 0);
 	printText("Number of Snow Particles:", -0.95, 0.85); // prints the snow amount
 	for (int i = 0; i < 4; i++) {
 		glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Snow Particles:") + i), 0.85);
@@ -399,9 +404,105 @@ void display(void)
 	}
 	printText("Press q to exit", -0.95, 0.75);// prints the comands
 	printText("Press s to stop snow", -0.95, 0.7);// prints the comands
-	printText("Click to summon bird", -0.95, 0.65);// prints the comands
-
-	
+	printText("Press f to toggle fire", -0.95, 0.65);// prints the comands
+	printText("Click to summon bird", -0.95, 0.6);// prints the comands
+	glColor3f(0.95, 0.95, 0.95);
+	if (fire == true) {
+		if (lightningSpawn+2 > framesPassed) {
+			glLineWidth(7);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[0],1);
+				glVertex2f(lightningPoints[1], 0.55);
+			glEnd();
+		}else if (lightningSpawn + 4 > framesPassed) {
+			glLineWidth(7);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[0], 1);
+				glVertex2f(lightningPoints[1], 0.55);
+			glEnd();
+			glLineWidth(6);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[1], 0.55);
+				glVertex2f(lightningPoints[2], 0.15);
+			glEnd();
+		}
+		else if (lightningSpawn + 6 > framesPassed) {
+			glLineWidth(7);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[0], 1);
+				glVertex2f(lightningPoints[1], 0.55);
+			glEnd();
+			glLineWidth(6);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[1], 0.55);
+				glVertex2f(lightningPoints[2], 0.15);
+			glEnd();
+			glLineWidth(5);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[2], 0.15);
+				glVertex2f(lightningPoints[3], -0.25);
+			glEnd();
+		}
+		else if (lightningSpawn + 40 > framesPassed) {
+			glLineWidth(7);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[0], 1);
+				glVertex2f(lightningPoints[1], 0.55);
+			glEnd();
+			glLineWidth(6);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[1], 0.55);
+				glVertex2f(lightningPoints[2], 0.15);
+			glEnd();
+			glLineWidth(5);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[2], 0.15);
+				glVertex2f(lightningPoints[3], -0.25);
+			glEnd();
+			glLineWidth(4);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[3], -0.25);
+				glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
+			glEnd();
+		}
+		else if (lightningSpawn + 42> framesPassed) {
+			glLineWidth(6);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[1], 0.55);
+				glVertex2f(lightningPoints[2], 0.15);
+			glEnd();
+			glLineWidth(5);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[2], 0.15);
+				glVertex2f(lightningPoints[3], -0.25);
+			glEnd();
+			glLineWidth(4);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[3], -0.25);
+				glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
+			glEnd();
+		}
+		else if (lightningSpawn + 44 > framesPassed) {
+			glLineWidth(5);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[2], 0.15);
+				glVertex2f(lightningPoints[3], -0.25);
+			glEnd();
+			glLineWidth(4);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[3], -0.25);
+				glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
+			glEnd();
+		}
+		else if (lightningSpawn + 46 > framesPassed) {
+			glLineWidth(4);
+			glBegin(GL_LINES);
+				glVertex2f(lightningPoints[3], -0.25);
+				glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
+			glEnd();
+		}
+		
+	}
 	
 	
 
@@ -488,6 +589,18 @@ void birdfunc(void) {
 	}
 }
 
+void lightning() {
+	lightningSpawn = framesPassed;
+	lightningPoints[4] = 0.53;
+	int multiplyer = 1;
+	if (rand() % 2 == 1) { multiplyer = -1; }
+	for (int i = 3; i >= 0; i--) {
+		lightningPoints[i] = ((((float)rand() / RAND_MAX) * 0.25f) + 0.1f) *(pow(-1,i)*multiplyer) + lightningPoints[i + 1];
+	}
+	
+
+}
+
 void keyPressed(unsigned char key, int x, int y)
 {
 	switch (tolower(key)) {
@@ -504,6 +617,9 @@ void keyPressed(unsigned char key, int x, int y)
 		if (snowfall == true) { snowfall = false; }
 		else { snowfall = true; }
 		break;
+	case KEY_F:
+		if (fire == true) { fire = false; }
+		else { fire = true; lightning(); }
 	}
 }
 
@@ -521,7 +637,6 @@ void idle(void)
 	unsigned int frameTimeElapsed = (unsigned int)glutGet(GLUT_ELAPSED_TIME) - frameStartTime;
 	if (frameTimeElapsed < FRAME_TIME)
 	{
-		//printf("skip");
 		// This frame took less time to render than the ideal FRAME_TIME: we'll suspend this thread for the remaining time,
 		// so we're not taking up the CPU until we need to render another frame.
 		unsigned int timeLeft = FRAME_TIME - frameTimeElapsed;
