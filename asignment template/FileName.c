@@ -100,12 +100,12 @@ typedef struct {
 	float dx;
 }bird;
 
-Partical  snow[10000];
+Partical  snow[10001];
 float lanscape[200];
 float snowHeight[3][200];
 
-bird birds[80];
-int activeBird[80];
+bird birds[31];
+int activeBird[31];
 int totalActiveBirds = 0;
 float angle = M_PI / 4;
 
@@ -123,7 +123,7 @@ void main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(FramePixels, FramePixels);
-	//glutInitWindowPosition(2150, 100); // so it displays on monitor, coment out when not uning monitor
+	glutInitWindowPosition(2150, 100); // so it displays on monitor, coment out when not uning monitor
 	glutCreateWindow("Animation");
 
 
@@ -198,9 +198,9 @@ void display(void)
 
 	float snowmanCenterColor[3] = { 1,1,1 };
 	float snowmanCuterColor[3] = { 0.6902, 0.83137, 0.8196 };
-	circle(0.15, 0, lanscape[100] + 0.1, 0, lanscape[100] + 0.1, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.12, 0, lanscape[100] + 0.36, 0, lanscape[100] + 0.36, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.07, 0, lanscape[100] + 0.54, 0, lanscape[100] + 0.54, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.15, -0.5, lanscape[100] + 0.1, -0.5, lanscape[100] + 0.1, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.12, -0.5, lanscape[100] + 0.36, -0.5, lanscape[100] + 0.36, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.07, -0.5, lanscape[100] + 0.54, -0.5, lanscape[100] + 0.54, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 
 	// makes snow of depth level 2 render infront of objects
 	glColor3f(1, 1, 1);
@@ -224,12 +224,9 @@ void display(void)
 	}
 
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < 30; i++) {
 		if (activeBird[i] == 1) {
-			glPointSize(10);
-			glColor3f(0, 0, 0);
 			float x, y;
-
 			float birdCenterColor[3] = { 0.2118, 0.1529, 0 };
 			float birdOuterColor[3] = { 0.2118, 0.1529, 0 };
 			glColor3f(0.2118, 0.1529, 0);
@@ -324,24 +321,78 @@ void display(void)
 		glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Snow Particles:") + i), 0.85);
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, (totalSnow / (int)pow(10, 3 - i)) % 10 + 48);
 	}
-	printText("/3900", -0.95 + (strlen("Number of Snow Particles:4000")) * 0.0225, 0.85);
+	printText("/10000", -0.95 + (strlen("Number of Snow Particles:4000")) * 0.0225, 0.85);
 
 	printText("Number of Birds:", -0.95, 0.8);// prints the bird amount
 	for (int i = 0; i < 2; i++) {
 		glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Birds:") + i), 0.8);
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, (totalActiveBirds / (int)pow(10, 1 - i)) % 10 + 48);
 	}
-	printText("/10", -0.95 + (strlen("Number of Birds:10")) * 0.0225, 0.8);
+	printText("/80", -0.95 + (strlen("Number of Birds:10")) * 0.0225, 0.8);
 
 	printText("Press q to exit", -0.95, 0.75);// prints the comands
 	printText("Press s to stop snow", -0.95, 0.7);// prints the comands
 	printText("Click to summon bird", -0.95, 0.65);// prints the comands
+
+	
+	float logCenterColor[3] = { 0.6392, 0.3412, 0.0627 };
+	float logOuterColor[3] = { 0.388235, 0.2, 0.0235 };
+	circle(0.05, 0.5, -0.76, 0.46, -0.74, logCenterColor, logOuterColor, 1.5 * M_PI, 1.815 * M_PI, true);
+	glBegin(GL_QUAD_STRIP);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.63, -0.8); //
+		glVertex2f(0.45, -0.76);
+		glColor3f(0.6392, 0.3412, 0.0627);
+		glVertex2f(0.64, -0.775); //
+		glVertex2f(0.46, -0.74);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.65, -0.75);
+		glVertex2f(0.47, -0.72);
+	glEnd();
+	circle(0.023, 0.558, -0.716, 0.56, -0.705, logCenterColor, logOuterColor, 1.7 * M_PI, 2.45 * M_PI, true);
+	glBegin(GL_QUAD_STRIP);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.43, -0.845);
+		glVertex2f(0.54, -0.7);
+		glColor3f(0.6392, 0.3412, 0.0627);
+		glVertex2f(0.455, -0.8525);
+		glVertex2f(0.56, -0.705);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.48, -0.86);
+		glVertex2f(0.58, -0.71);
+	glEnd();
+	circle(0.0235, 0.498, -0.713, 0.49, -0.7, logCenterColor, logOuterColor, 1.5 * M_PI, 2.1 * M_PI, true);
+	glBegin(GL_QUAD_STRIP);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.6, -0.87);
+		glVertex2f(0.475, -0.71);
+		glColor3f(0.6392, 0.3412, 0.0627);
+		glVertex2f(0.6225, -0.86);
+		glVertex2f(0.49, -0.7);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.645, -0.85);
+		glVertex2f(0.505, -0.69);
+	glEnd();
+	circle(0.0235, 0.522, -0.72, 0.5175, -0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, true);
+	glBegin(GL_QUAD_STRIP);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.51, -0.89);
+		glVertex2f(0.50, -0.71);
+		glColor3f(0.6392, 0.3412, 0.0627);
+		glVertex2f(0.535, -0.885);
+		glVertex2f(0.5175, -0.705);
+		glColor3f(0.388235, 0.2, 0.0235);
+		glVertex2f(0.56, -0.88);
+		glVertex2f(0.535, -0.7);
+	glEnd();
+	
+
 	glutSwapBuffers();
 }
 void printText(char text[], float x, float y) {
 	for (int i = 0; i < strlen(text); i++) {
 		glRasterPos2f(x + 0.0225 * i, y);
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, text[i]);
+		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, text[i]);
 	}
 }
 
@@ -376,6 +427,7 @@ void circle(float radius, float x, float y, float centerX, float centerY, float 
 	glEnd();
 }
 
+
 /*
 	Called when the OpenGL window has been resized.
 */
@@ -402,7 +454,7 @@ void birdfunc(void) {
 	p2y = p2y * ((clickpos[0] - 1) * -1);
 	if (rand() % 2 == 1) { p2y = -p2y; }
 	p2y += clickpos[1];
-	for (int i = 0; i < 80; i++) {
+	for (int i = 0; i < 30; i++) {
 		if (activeBird[i] == 0) {
 			totalActiveBirds++;
 			activeBird[i] = 1;
@@ -451,7 +503,7 @@ void idle(void)
 	unsigned int frameTimeElapsed = (unsigned int)glutGet(GLUT_ELAPSED_TIME) - frameStartTime;
 	if (frameTimeElapsed < FRAME_TIME)
 	{
-		printf("skip");
+		//printf("skip");
 		// This frame took less time to render than the ideal FRAME_TIME: we'll suspend this thread for the remaining time,
 		// so we're not taking up the CPU until we need to render another frame.
 		unsigned int timeLeft = FRAME_TIME - frameTimeElapsed;
@@ -488,7 +540,7 @@ void init(void)
 		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 		snow[i].active = true;
 	}
-	for (int i = totalSnow + 1; i < 10000; i++) {
+	for (int i = totalSnow + 1; i <= 10000; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 		snow[i].location.y = 1.05f; // off render untill active
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
@@ -539,7 +591,7 @@ void think(void)
 
 	if (snowfall) {
 		if (totalSnow != 10000) {
-			for (int i = 0; i < 10000; i++) {
+			for (int i = 0; i <= 10000; i++) {
 				if (snow[i].active == false) {
 					totalSnow++;
 					snow[i].active = true;
@@ -551,7 +603,7 @@ void think(void)
 	}
 
 	//angle += 0.01;
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i <= 10000; i++) {
 		if (snow[i].active) {
 			snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
 			int heightIndex = round((snow[i].location.x + 1) * 100);
