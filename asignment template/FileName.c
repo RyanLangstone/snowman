@@ -99,11 +99,12 @@ typedef struct {
 	Position2 location;
 	Quadric formula;
 	float dx;
+	float theta;
 }bird;
 
-Partical  snow[10001];
+Partical  snow[50001];
 float lanscape[200];
-float snowHeight[3][200];
+float snowHeight[4][200];
 
 bird birds[31];
 int activeBird[31];
@@ -194,7 +195,7 @@ void display(void)
 	else { firstPass = false; }
 
 	glColor3f(1, 1, 1);
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 5000; i++) {
 		if (snow[i].depth <= 1 && snow[i].active) {
 			glPointSize(snow[i].size);
 			glBegin(GL_POINTS);
@@ -215,7 +216,7 @@ void display(void)
 
 	// makes snow of depth level 2 render infront of objects
 	glColor3f(1, 1, 1);
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 5000; i++) {
 		if (snow[i].depth == 2 && snow[i].active) {
 			glPointSize(snow[i].size);
 			glBegin(GL_POINTS);
@@ -299,96 +300,101 @@ void display(void)
 		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, "h");
 	}
 
-
 	for (int i = 0; i < 30; i++) {
 		if (activeBird[i] == 1) {
+			glLoadIdentity();
+			glPushMatrix();
+			glTranslatef(birds[i].location.x, birds[i].location.y, 0);
+
+			glRotatef(birds[i].theta, 0.0, 0.0, 1.0);
+			//glTranslatef(-birds[i].location.x, -birds[i].location.y, 0);
 			float x, y;
 			float birdCenterColor[3] = { 0.2118, 0.1529, 0 };
 			float birdOuterColor[3] = { 0.2118, 0.1529, 0 };
 			glColor3f(0.2118, 0.1529, 0);
 
+			
 
 			glBegin(GL_POLYGON);
 			rotate(0, 0.035355, 0.017678, &x, &y);
-			glVertex2f(birds[i].location.x + x, birds[i].location.y + y);
-			glVertex2f(birds[i].location.x - x, birds[i].location.y + y);
-			glVertex2f(birds[i].location.x - x, birds[i].location.y - y);
-			glVertex2f(birds[i].location.x + x, birds[i].location.y - y);
+			glVertex2f(0 + x, 0 + y);
+			glVertex2f(0 - x, 0 + y);
+			glVertex2f(0 - x, 0 - y);
+			glVertex2f(0 + x, 0 - y);
 			glEnd();
 
 			glBegin(GL_POLYGON);
 			rotate(0, 0.008445, 0.035606602, &x, &y);
-			glVertex2f(birds[i].location.x + x, birds[i].location.y + y);
+			glVertex2f(0 + x, 0 + y);
 			rotate(0, -0.030445, 0.035606602, &x, &y);
-			glVertex2f(birds[i].location.x + x, birds[i].location.y + y);
+			glVertex2f(0 + x, 0 + y);
 			rotate(0, -0.030445, 0.014393398, &x, &y);
-			glVertex2f(birds[i].location.x + x, birds[i].location.y + y);
+			glVertex2f(0 + x, 0 + y);
 			rotate(0, 0.008445, 0.014393398, &x, &y);
-			glVertex2f(birds[i].location.x + x, birds[i].location.y + y);
+			glVertex2f(0 + x, 0 + y);
 			glEnd();
 
 			glBegin(GL_TRIANGLES);
-			glVertex2f(birds[i].location.x + 0.005, birds[i].location.y + 0.045);
-			glVertex2f(birds[i].location.x + 0.005, birds[i].location.y + 0.015);
-			glVertex2f(birds[i].location.x + 0.02, birds[i].location.y + 0.015);
+			glVertex2f(0 + 0.005, 0 + 0.045);
+			glVertex2f(0 + 0.005, 0 + 0.015);
+			glVertex2f(0 + 0.02, 0 + 0.015);
 			glEnd();
 
 			glBegin(GL_TRIANGLES);
-			glVertex2f(birds[i].location.x - 0.035, birds[i].location.y + 0.03);
-			glVertex2f(birds[i].location.x + 0.01, birds[i].location.y + 0.03);
-			glVertex2f(birds[i].location.x + 0.01, birds[i].location.y + 0.063);
+			glVertex2f(0 - 0.035, 0 + 0.03);
+			glVertex2f(0 + 0.01, 0 + 0.03);
+			glVertex2f(0 + 0.01, 0 + 0.063);
 			glEnd();
 
 			glBegin(GL_POLYGON);
-			glVertex2f(birds[i].location.x + 0.035, birds[i].location.y + 0.01);
-			glVertex2f(birds[i].location.x + 0.06, birds[i].location.y + 0.01);
-			glVertex2f(birds[i].location.x + 0.06, birds[i].location.y + 0.02);
-			glVertex2f(birds[i].location.x + 0.035, birds[i].location.y + 0.02);
+			glVertex2f(0 + 0.035, 0 + 0.01);
+			glVertex2f(0 + 0.06, 0 + 0.01);
+			glVertex2f(0 + 0.06, 0 + 0.02);
+			glVertex2f(0 + 0.035, 0 + 0.02);
 			glEnd();
 
 			glBegin(GL_POLYGON);
-			glVertex2f(birds[i].location.x - 0.05, birds[i].location.y + 0.0025);
-			glVertex2f(birds[i].location.x - 0.0625, birds[i].location.y + 0.0025);
-			glVertex2f(birds[i].location.x - 0.0625, birds[i].location.y + 0.015);
-			glVertex2f(birds[i].location.x + 0.05, birds[i].location.y + 0.015);
+			glVertex2f(0 - 0.05, 0 + 0.0025);
+			glVertex2f(0 - 0.0625, 0 + 0.0025);
+			glVertex2f(0 - 0.0625, 0 + 0.015);
+			glVertex2f(0 + 0.05, 0 + 0.015);
 			glEnd();
 
 			glBegin(GL_POLYGON);
-			glVertex2f(birds[i].location.x - 0.05, birds[i].location.y + 0.02);
-			glVertex2f(birds[i].location.x - 0.06, birds[i].location.y + 0.02);
-			glVertex2f(birds[i].location.x - 0.06, birds[i].location.y + 0.015);
-			glVertex2f(birds[i].location.x + 0.05, birds[i].location.y + 0.015);
+			glVertex2f(0 - 0.05, 0 + 0.02);
+			glVertex2f(0 - 0.06, 0 + 0.02);
+			glVertex2f(0 - 0.06, 0 + 0.015);
+			glVertex2f(0 + 0.05, 0 + 0.015);
 			glEnd();
 
 			glBegin(GL_TRIANGLES);
-			glVertex2f(birds[i].location.x - 0.045, birds[i].location.y + 0.02);
-			glVertex2f(birds[i].location.x - 0.065, birds[i].location.y + 0.0175);
-			glVertex2f(birds[i].location.x - 0.065, birds[i].location.y + 0.0275);
+			glVertex2f(0 - 0.045, 0 + 0.02);
+			glVertex2f(0 - 0.065, 0 + 0.0175);
+			glVertex2f(0 - 0.065, 0 + 0.0275);
 			glEnd();
 
 
 			glColor3f(0, 0, 0);
 			glBegin(GL_TRIANGLES);
-			glVertex2f(birds[i].location.x + 0.06, birds[i].location.y + 0.01);
-			glVertex2f(birds[i].location.x + 0.06, birds[i].location.y + 0.02);
-			glVertex2f(birds[i].location.x + 0.07, birds[i].location.y + 0.012);
+			glVertex2f(0 + 0.06, 0 + 0.01);
+			glVertex2f(0 + 0.06, 0 + 0.02);
+			glVertex2f(0 + 0.07, 0 + 0.012);
 			glEnd();
 			glColor3f(0.2118, 0.1529, 0);
 
-			circle(0.005, birds[i].location.x - 0.0625, birds[i].location.y + 0.007375, birds[i].location.x - 0.0625, birds[i].location.y + 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
-			circle(0.00375, birds[i].location.x - 0.065, birds[i].location.y + 0.02375, birds[i].location.x - 0.065, birds[i].location.y + 0.02375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
-			circle(0.0275, birds[i].location.x - 0.005, birds[i].location.y + (0.035 / sin(M_PI / 4)) * sin(angle), birds[i].location.x + (0.005 / sin(M_PI / 4)) * cos(angle), birds[i].location.y + (0.03 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.25 * M_PI, 2.15 * M_PI, false);
-			circle(0.03, birds[i].location.x - 0.035, birds[i].location.y + 0.05, birds[i].location.x - 0.05, birds[i].location.y + 0.01, birdCenterColor, birdOuterColor, 1 * M_PI, 1.17 * M_PI, false);
-			circle(0.3, birds[i].location.x + (0.015 / sin(M_PI / 4)) * cos(angle), birds[i].location.y + (0.277 / sin(M_PI / 4)) * sin(angle), birds[i].location.x + (0.015 / sin(M_PI / 4)) * cos(angle), birds[i].location.y + (-0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1 * M_PI - M_PI / 4 + angle, 1.055 * M_PI - M_PI / 4 + angle, false);
-			circle(0.052, birds[i].location.x - (0.00 / sin(M_PI / 4)) * cos(angle), birds[i].location.y + (0.022 / sin(M_PI / 4)) * sin(angle), birds[i].location.x - (0.03 / sin(M_PI / 4)) * cos(angle), birds[i].location.y + (0.018 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.2 * M_PI - M_PI / 4 + angle, 1.46 * M_PI - M_PI / 4 + angle, false);
-			circle(0.02, birds[i].location.x + 0.056569 * cos(angle), birds[i].location.y + (0.018 / sin(M_PI / 4)) * sin(angle), birds[i].location.x + (0.04 / sin(M_PI / 4)) * cos(angle), birds[i].location.y + (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.45 * M_PI, 2.55 * M_PI, false);
-			circle(0.055, birds[i].location.x + 0.120202 * cos(angle), birds[i].location.y - (0.04 / sin(M_PI / 4)) * sin(angle), birds[i].location.x + (0.035 / sin(M_PI / 4)) * cos(angle), birds[i].location.y + (0.01 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.625 * M_PI - M_PI / 4 + angle, 1.9 * M_PI - M_PI / 4 + angle, false);
-			circle(0.02, birds[i].location.x + (0.015 / sin(M_PI / 4)) * cos(angle), birds[i].location.y - (0.003 / sin(M_PI / 4)) * sin(angle), birds[i].location.x + (0.015 / sin(M_PI / 4)) * cos(angle), birds[i].location.y - (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, M_PI - M_PI / 4, 1 * M_PI - M_PI / 4 + angle, false);
+			circle(0.005, 0 - 0.0625, 0 + 0.007375, 0 - 0.0625, 0 + 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
+			circle(0.00375, 0 - 0.065, 0 + 0.02375, 0 - 0.065, 0 + 0.02375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
+			circle(0.0275, 0 - 0.005, 0 + (0.035 / sin(M_PI / 4)) * sin(angle), 0 + (0.005 / sin(M_PI / 4)) * cos(angle), 0 + (0.03 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.25 * M_PI, 2.15 * M_PI, false);
+			circle(0.03, 0 - 0.035, 0 + 0.05, 0 - 0.05, 0 + 0.01, birdCenterColor, birdOuterColor, 1 * M_PI, 1.17 * M_PI, false);
+			circle(0.3, 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 + (0.277 / sin(M_PI / 4)) * sin(angle), 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 + (-0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1 * M_PI - M_PI / 4 + angle, 1.055 * M_PI - M_PI / 4 + angle, false);
+			circle(0.052, 0 - (0.00 / sin(M_PI / 4)) * cos(angle), 0 + (0.022 / sin(M_PI / 4)) * sin(angle), 0 - (0.03 / sin(M_PI / 4)) * cos(angle), 0 + (0.018 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.2 * M_PI - M_PI / 4 + angle, 1.46 * M_PI - M_PI / 4 + angle, false);
+			circle(0.02, 0 + 0.056569 * cos(angle), 0 + (0.018 / sin(M_PI / 4)) * sin(angle), 0 + (0.04 / sin(M_PI / 4)) * cos(angle), 0 + (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.45 * M_PI, 2.55 * M_PI, false);
+			circle(0.055, 0 + 0.120202 * cos(angle), 0 - (0.04 / sin(M_PI / 4)) * sin(angle), 0 + (0.035 / sin(M_PI / 4)) * cos(angle), 0 + (0.01 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.625 * M_PI - M_PI / 4 + angle, 1.9 * M_PI - M_PI / 4 + angle, false);
+			circle(0.02, 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 - (0.003 / sin(M_PI / 4)) * sin(angle), 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 - (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, M_PI - M_PI / 4, 1 * M_PI - M_PI / 4 + angle, false);
 			float eyeColour[3] = { 1,1,1 };
-			circle(0.004, birds[i].location.x + 0.045, birds[i].location.y + 0.025, birds[i].location.x + 0.045, birds[i].location.y + 0.025, eyeColour, eyeColour, 0 * M_PI, 2 * M_PI, false);
+			circle(0.004, 0 + 0.045, 0 + 0.025, 0 + 0.045, 0 + 0.025, eyeColour, eyeColour, 0 * M_PI, 2 * M_PI, false);
 
-
-			
+			glPopMatrix();
 		}
 	}
 	glColor3f(0, 0, 0);
@@ -397,7 +403,7 @@ void display(void)
 		glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Snow Particles:") + i), 0.85);
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, (totalSnow / (int)pow(10, 3 - i)) % 10 + 48);
 	}
-	printText("/10000", -0.95 + (strlen("Number of Snow Particles:4000")) * 0.0225, 0.85);
+	printText("/5000", -0.95 + (strlen("Number of Snow Particles:4000")) * 0.0225, 0.85);
 
 	printText("Number of Birds:", -0.95, 0.8);// prints the bird amount
 	if (totalActiveBirds < 10) {
@@ -544,10 +550,11 @@ void circle(float radius, float x, float y, float centerX, float centerY, float 
 			glVertex2f(x + radius * sin(i), y + radius * cos(i));
 			int heightIndex = round((x + radius * sin(i) + 1) * 100);
 			if (snowHeight[1][heightIndex] < y + radius * cos(i)) {
-				snowHeight[1][heightIndex] = y + radius * cos(i);
+				snowHeight[1][heightIndex] = y + radius * cos(i) - 0.003;
 			}
 			if (snowHeight[2][heightIndex] > y + radius * cos(i)) {
-				snowHeight[2][heightIndex] = y + radius * cos(i);
+				snowHeight[2][heightIndex] = y + radius * cos(i)-0.003;
+				snowHeight[3][heightIndex] = y + radius * cos(i) - 0.003;
 			}
 		}
 	}
@@ -592,6 +599,7 @@ void birdfunc(void) {
 			birds[i].location.x = -1.1;
 			birds[i].location.y = p1y;
 			birds[i].dx = ((((float)rand() / RAND_MAX) * 0.02f) + 0.0055f);
+			birds[i].theta = 0;
 			break;
 		}
 	}
@@ -681,7 +689,7 @@ void init(void)
 		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 		snow[i].active = true;
 	}
-	for (int i = totalSnow + 1; i <= 10000; i++) {
+	for (int i = totalSnow + 1; i <= 5000; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 		snow[i].location.y = 1.05f; // off render untill active
 		snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
@@ -702,7 +710,7 @@ void init(void)
 		else if (lanscape[i] < -0.75) {
 			lanscape[i] = -0.75;
 		}
-		snowHeight[0][i] = snowHeight[1][i] = snowHeight[2][i] = lanscape[i] - 0.003;
+		snowHeight[0][i] = snowHeight[1][i] = snowHeight[2][i] = snowHeight[3][i] = lanscape[i] - 0.003;
 	}
 
 	/*//test to devlop bird
@@ -713,8 +721,8 @@ void init(void)
 	birds[0].location.x = 0;
 	birds[0].location.y = 0.3;
 	birds[0].dx = 0;
-	activeBird[0] = 1;*/
-
+	activeBird[0] = 1;
+	*/
 }
 
 /*
@@ -731,8 +739,8 @@ void think(void)
 	framesPassed++;
 
 	if (snowfall) {
-		if (totalSnow != 10000) {
-			for (int i = 0; i <= 10000; i++) {
+		if (totalSnow != 5000) {
+			for (int i = 0; i <= 5000; i++) {
 				if (snow[i].active == false) {
 					totalSnow++;
 					snow[i].active = true;
@@ -744,17 +752,18 @@ void think(void)
 	}
 
 	//angle += 0.01;
-	for (int i = 0; i <= 10000; i++) {
+	for (int i = 0; i <= 5000; i++) {
 		if (snow[i].active) {
 			snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
 			int heightIndex = round((snow[i].location.x + 1) * 100);
 			if (heightIndex > 199) { heightIndex = 199; } // stops error where they round to the next one and go lower than the lanscape
 			if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[snow[i].depth][heightIndex] && snow[i].landTime == 0) {
+				snow[i].location.y = snowHeight[snow[i].depth][heightIndex]+ (snow[i].size / FramePixels);
 				snow[i].landTime = framesPassed;
 				snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
 				snow[i].dy = 0;
 				if (fire == true && lightningSpawn + 6 < framesPassed) {
-					if (snow[i].location.x > 0.33 && snow[i].location.x < 0.73) {
+					if (snow[i].location.x >= 0.33 && snow[i].location.x <= 0.73) {
 						snow[i].lifetime = 0;
 					}
 					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) {
@@ -774,7 +783,7 @@ void think(void)
 				snow[i].location.y = snowHeight[snow[i].depth][heightIndex];
 			}
 			if (framesPassed > snow[i].landTime + snow[i].lifetime && snow[i].landTime != 0) {
-				for (int x = 0; x < 10000; x++) {
+				for (int x = 0; x < 5000; x++) {
 					if ((round((snow[x].location.x + 1) * 100) == round((snow[i].location.x + 1) * 100) && snow[x].landTime != 0) && snow[x].location.y > snow[i].location.y && snow[x].depth == snow[i].depth) {
 						snow[x].location.y -= snow[i].size / FramePixels;
 					}
@@ -786,7 +795,7 @@ void think(void)
 				snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
 
 				snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
-				if (snowfall == true) {
+				if (snowfall == true && true != (fire == true && lightningSpawn + 7 == framesPassed)) {
 					snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
 				}
 				else {
@@ -797,9 +806,8 @@ void think(void)
 			}
 			if (fire == true && lightningSpawn + 6 == framesPassed) {
 				if (snow[i].landTime != 0) {
-					if (snow[i].location.x > 0.33 && snow[i].location.x < 0.73) {
-						snowHeight[snow[i].depth][heightIndex] -= snow[i].size / FramePixels;
-						snow[i].landTime = 0;
+					if (snow[i].location.x >= 0.33 && snow[i].location.x <= 0.73) {
+						snow[i].lifetime = 0;
 						snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 						snow[i].location.y = 1.05f;
 						snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
@@ -810,8 +818,41 @@ void think(void)
 					}
 					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.38) * -1.5)); }
 					else if (snow[i].location.x >= 0.73) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.68) * 1.5)); }
+					if (framesPassed > snow[i].landTime + snow[i].lifetime) {
+						
+					}
 				}
+				for (int x = 133; x <= 173; x ++) {
+					snowHeight[0][x] = lanscape[x] - 0.003;
+					snowHeight[1][x] = lanscape[x] - 0.003;
+					snowHeight[2][x] = lanscape[x] - 0.003;
+
+				}
+
 			}
+			if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[3][heightIndex]) {
+				snow[i].location.y = snowHeight[3][heightIndex] + (snow[i].size / FramePixels);
+				snow[i].location.y = snowHeight[snow[i].depth][heightIndex]+ (snow[i].size / FramePixels);
+				snow[i].landTime = framesPassed;
+				snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
+				snow[i].dy = 0;
+				if (fire == true && lightningSpawn + 6 < framesPassed) {
+					if (snow[i].location.x >= 0.33 && snow[i].location.x <= 0.73) {
+						snow[i].lifetime = 0;
+					}
+					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) {
+						snow[i].lifetime = (rand() % 3500 + 2000) * (snow[i].location.x - 0.38) * -1.5;
+					}
+					else if (snow[i].location.x >= 0.73) {
+						snow[i].lifetime = (rand() % 3500 + 2000) * ((snow[i].location.x - 0.68) * 1.5);
+					}
+					else {
+						snow[i].lifetime = rand() % 3500 + 2000;
+					}
+				}
+				if(snowHeight[snow[i].depth][heightIndex] < snow[i].location.y){ snowHeight[snow[i].depth][heightIndex] += snow[i].location.y;}
+			}
+
 		}
 	}
 	
@@ -819,12 +860,18 @@ void think(void)
 	for (int i = 0; i < 80; i++) {
 		if (activeBird[i] == 1) {
 			birds[i].location.x += birds[i].dx;
+			float gradient;
 			if (birds[i].location.x > 1.1) { activeBird[i] = 0; totalActiveBirds--; continue; }
 			if (birds[i].location.x <= birds[i].formula.X2) {
 				birds[i].location.y = birds[i].formula.A * pow((birds[i].location.x - birds[i].formula.X2), 2) + birds[i].formula.Y2;
+				gradient = 2 * birds[i].formula.A * (birds[i].location.x - birds[i].formula.X2);
 			}
 			else {
 				birds[i].location.y = birds[i].formula.B * pow((birds[i].location.x - birds[i].formula.X2), 2) + birds[i].formula.Y2;
+				gradient = 2 * birds[i].formula.B * (birds[i].location.x - birds[i].formula.X2);
+			}
+			birds[i].theta = atan(gradient)*180/M_PI;
+			if (i != 0) {
 			}
 		}
 	}
