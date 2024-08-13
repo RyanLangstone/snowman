@@ -92,6 +92,7 @@ typedef struct {
 	int landTime;
 	int lifetime;
 	int depth;
+	float transparancy;
 	bool active;
 }Partical;
 
@@ -129,7 +130,7 @@ void main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(FramePixels, FramePixels);
-	glutInitWindowPosition(2150, 100); // so it displays on monitor, coment out when not uning monitor
+	//glutInitWindowPosition(2150, 100); // so it displays on monitor, coment out when not uning monitor
 	glutCreateWindow("Animation");
 
 
@@ -166,26 +167,31 @@ void main(int argc, char** argv)
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glColor3f(0.298, 0.6902, 0.0196);
 	glBegin(GL_QUAD_STRIP);
 	int num = 0;
 	for (float i = -1; i < 1; i += 0.0101) {
+		glColor4f(0.15294, 0.56863, 0.0667, 1);
 		glVertex2f(i, -1);
+		glColor4f(0.298, 0.6902, 0.0196, 1);
 		glVertex2f(i, lanscape[num]);
 		num++;
 	}
 	glEnd();
-	float circleCenter[3] = { 0.16863,0.117647,0.02353 };
-	float circleOuter[3] = { 0.25098, 0.17255, 0.02353 };
+	float circleCenter[4] = { 0.16863,0.117647,0.02353,1 };
+	float circleOuter[4] = { 0.25098, 0.17255, 0.02353,1 };
 	circle(0.2, 0.53, lanscape[145], 0.53, lanscape[145], circleCenter, circleOuter, 0, 2 * M_PI, false);
 
 
 	glBegin(GL_QUAD_STRIP); // sky to be invert of the ground
-	glColor3f(0.647, 0.898, 0.9686274);
+	
 	num = 0;
 	for (float i = -1; i <= 1; i += 0.0101) {
+		glColor4f(0.557, 0.808, 1, 1);
 		glVertex2f(i, 1);
+		glColor4f(0.647, 0.898, 0.9686274, 1);
 		glVertex2f(i, lanscape[num]);
 		num++;
 	}
@@ -194,9 +200,10 @@ void display(void)
 	if (framesPassed == 1) { firstPass = true; }
 	else { firstPass = false; }
 
-	glColor3f(1, 1, 1);
+	
 	for (int i = 0; i < 5000; i++) {
 		if (snow[i].depth <= 1 && snow[i].active) {
+			glColor4f(1, 1, 1, snow[i].transparancy);
 			glPointSize(snow[i].size);
 			glBegin(GL_POINTS);
 			glVertex2f(snow[i].location.x, snow[i].location.y);
@@ -208,16 +215,16 @@ void display(void)
 
 
 
-	float snowmanCenterColor[3] = { 1,1,1 };
-	float snowmanCuterColor[3] = { 0.6902, 0.83137, 0.8196 };
+	float snowmanCenterColor[4] = { 1,1,1,1 };
+	float snowmanCuterColor[4] = { 0.6902, 0.83137, 0.8196,1 };
 	circle(0.15, -0.5, lanscape[50] + 0.1, -0.5, lanscape[50] + 0.1, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 	circle(0.12, -0.5, lanscape[50] + 0.36, -0.5, lanscape[50] + 0.36, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 	circle(0.07, -0.5, lanscape[50] + 0.54, -0.5, lanscape[50] + 0.54, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 
 	// makes snow of depth level 2 render infront of objects
-	glColor3f(1, 1, 1);
 	for (int i = 0; i < 5000; i++) {
 		if (snow[i].depth == 2 && snow[i].active) {
+			glColor4f(1, 1, 1, snow[i].transparancy);
 			glPointSize(snow[i].size);
 			glBegin(GL_POINTS);
 			glVertex2f(snow[i].location.x, snow[i].location.y);
@@ -226,66 +233,68 @@ void display(void)
 	}
 
 
-	float logCenterColor[3] = { 0.6392, 0.3412, 0.0627 };
-	float logOuterColor[3] = { 0.388235, 0.2, 0.0235 };
+	float logCenterColor[4] = { 0.6392, 0.3412, 0.0627,1 };
+	float logOuterColor[4] = { 0.388235, 0.2, 0.0235,1 };
 	circle(0.05, 0.5, lanscape[145] + 0.78 -0.785, 0.46, lanscape[145] + 0.78 -0.765, logCenterColor, logOuterColor, 1.5 * M_PI, 1.815 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
-		glColor3f(0.388235, 0.2, 0.0235);
+		glColor4f(0.388235, 0.2, 0.0235,1);
 		glVertex2f(0.63, lanscape[145] + 0.78 -0.825); //lanscape[145]+0.79
 		glVertex2f(0.45, lanscape[145] + 0.78 -0.785); //lanscape[150]-0.09
-		glColor3f(0.6392, 0.3412, 0.0627);
+		glColor4f(0.6392, 0.3412, 0.0627,1);
 		glVertex2f(0.64, lanscape[145] + 0.78 -0.80); //lanscape[150]-0.05
 		glVertex2f(0.46, lanscape[145] + 0.78 -0.765);
-		glColor3f(0.388235, 0.2, 0.0235);
+		glColor4f(0.388235, 0.2, 0.0235,1);
 		glVertex2f(0.65, lanscape[145] + 0.78 -0.775);
 		glVertex2f(0.47, lanscape[145] + 0.78 -0.745);
 	glEnd();
 	circle(0.023, 0.558, lanscape[145] + 0.78 -0.716, 0.56, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.7 * M_PI, 2.45 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
-		glColor3f(0.388235, 0.2, 0.0235);
+		glColor4f(0.388235, 0.2, 0.0235,1);
 		glVertex2f(0.43, lanscape[145] + 0.78 -0.845);
 		glVertex2f(0.54, lanscape[145] + 0.78 -0.7);
-		glColor3f(0.6392, 0.3412, 0.0627);
+		glColor4f(0.6392, 0.3412, 0.0627,1);
 		glVertex2f(0.455, lanscape[145] + 0.78 -0.8525);
 		glVertex2f(0.56, lanscape[145] + 0.78 -0.705);
-		glColor3f(0.388235, 0.2, 0.0235);
+		glColor4f(0.388235, 0.2, 0.0235,1);
 		glVertex2f(0.48, lanscape[145] + 0.78 -0.86);
 		glVertex2f(0.58, lanscape[145] + 0.78 -0.71);
 	glEnd();
 	circle(0.0235, 0.498, lanscape[145] + 0.78 -0.713, 0.49, lanscape[145] + 0.78 -0.7, logCenterColor, logOuterColor, 1.5 * M_PI, 2.1 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
-		glColor3f(0.388235, 0.2, 0.0235);
+		glColor4f(0.388235, 0.2, 0.0235,1);
 		glVertex2f(0.6, lanscape[145] + 0.78 -0.87);
 		glVertex2f(0.475, lanscape[145] + 0.78 -0.71);
-		glColor3f(0.6392, 0.3412, 0.0627);
+		glColor4f(0.6392, 0.3412, 0.0627,1);
 		glVertex2f(0.6225, lanscape[145] + 0.78 -0.86);
 		glVertex2f(0.49, lanscape[145] + 0.78 -0.7);
-		glColor3f(0.388235, 0.2, 0.0235);
+		glColor4f(0.388235, 0.2, 0.0235,1);
 		glVertex2f(0.645, lanscape[145] + 0.78 -0.85);
 		glVertex2f(0.505, lanscape[145] + 0.78 -0.69);
 	glEnd();
+
 	if (fire == true && lightningSpawn + 6 < framesPassed) {
 		circleCenter[0] = 1;
 		circleCenter[1] = 0;
 		circleCenter[2] = 0;
-		glColor3f(1, 0, 0);
+		glColor4f(1, 0, 0,1);
 		circle(0.05, 0.53, lanscape[145], 0.53, lanscape[145], circleCenter, circleCenter, 0, 2* M_PI, false);
 
 	}
+
 	circle(0.0235, 0.522, lanscape[145] + 0.78 -0.72, 0.5175, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
-		glColor3f(0.388235, 0.2, 0.0235);
+		glColor4f(0.388235, 0.2, 0.0235,1);
 		glVertex2f(0.51, lanscape[145] + 0.78 -0.89);
 		glVertex2f(0.50, lanscape[145] + 0.78 -0.71);
-		glColor3f(0.6392, 0.3412, 0.0627);
+		glColor4f(0.6392, 0.3412, 0.0627,1);
 		glVertex2f(0.535, lanscape[145] + 0.78 -0.885);
 		glVertex2f(0.5175, lanscape[145] + 0.78 -0.705);
-		glColor3f(0.388235, 0.2, 0.0235);
+		glColor4f(0.388235, 0.2, 0.0235,1);
 		glVertex2f(0.56, lanscape[145] + 0.78 -0.88);
 		glVertex2f(0.535, lanscape[145] + 0.78 -0.7);
 	glEnd();
-	float stoneCenterColor[3] = { 0.77255, 0.77255, 0.77255 };
-	float stoneOuterColor[3] = { 0.67843, 0.65098, 0.62745 };
+	float stoneCenterColor[4] = { 0.77255, 0.77255, 0.77255,1 };
+	float stoneOuterColor[4] = { 0.67843, 0.65098, 0.62745,1 };
 	circle(0.02, 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.5 * M_PI), 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.5* M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
 	circle(0.02, 0.53 + 0.15 * sin(1 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1 * M_PI), 0.53 + 0.15 * sin(1 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
 	circle(0.02, 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.5 * M_PI), 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.5 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
@@ -309,9 +318,9 @@ void display(void)
 			glRotatef(birds[i].theta, 0.0, 0.0, 1.0);
 			//glTranslatef(-birds[i].location.x, -birds[i].location.y, 0);
 			float x, y;
-			float birdCenterColor[3] = { 0.2118, 0.1529, 0 };
-			float birdOuterColor[3] = { 0.2118, 0.1529, 0 };
-			glColor3f(0.2118, 0.1529, 0);
+			float birdCenterColor[4] = { 0.2118, 0.1529, 0,1 };
+			float birdOuterColor[4] = { 0.2118, 0.1529, 0,1 };
+			glColor4f(0.2118, 0.1529, 0,1);
 
 			
 
@@ -374,13 +383,13 @@ void display(void)
 			glEnd();
 
 
-			glColor3f(0, 0, 0);
+			glColor4f(0, 0, 0,1);
 			glBegin(GL_TRIANGLES);
 			glVertex2f(0 + 0.06, 0 + 0.01);
 			glVertex2f(0 + 0.06, 0 + 0.02);
 			glVertex2f(0 + 0.07, 0 + 0.012);
 			glEnd();
-			glColor3f(0.2118, 0.1529, 0);
+			glColor4f(0.2118, 0.1529, 0,1);
 
 			circle(0.005, 0 - 0.0625, 0 + 0.007375, 0 - 0.0625, 0 + 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
 			circle(0.00375, 0 - 0.065, 0 + 0.02375, 0 - 0.065, 0 + 0.02375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
@@ -391,13 +400,13 @@ void display(void)
 			circle(0.02, 0 + 0.056569 * cos(angle), 0 + (0.018 / sin(M_PI / 4)) * sin(angle), 0 + (0.04 / sin(M_PI / 4)) * cos(angle), 0 + (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.45 * M_PI, 2.55 * M_PI, false);
 			circle(0.055, 0 + 0.120202 * cos(angle), 0 - (0.04 / sin(M_PI / 4)) * sin(angle), 0 + (0.035 / sin(M_PI / 4)) * cos(angle), 0 + (0.01 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.625 * M_PI - M_PI / 4 + angle, 1.9 * M_PI - M_PI / 4 + angle, false);
 			circle(0.02, 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 - (0.003 / sin(M_PI / 4)) * sin(angle), 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 - (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, M_PI - M_PI / 4, 1 * M_PI - M_PI / 4 + angle, false);
-			float eyeColour[3] = { 1,1,1 };
+			float eyeColour[4] = { 1,1,1,1 };
 			circle(0.004, 0 + 0.045, 0 + 0.025, 0 + 0.045, 0 + 0.025, eyeColour, eyeColour, 0 * M_PI, 2 * M_PI, false);
 
 			glPopMatrix();
 		}
 	}
-	glColor3f(0, 0, 0);
+	glColor4f(0, 0, 0,1);
 	printText("Number of Snow Particles:", -0.95, 0.85); // prints the snow amount
 	for (int i = 0; i < 4; i++) {
 		glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Snow Particles:") + i), 0.85);
@@ -420,7 +429,7 @@ void display(void)
 	printText("Press s to stop snow", -0.95, 0.7);// prints the comands
 	printText("Press f to toggle fire", -0.95, 0.65);// prints the comands
 	printText("Click to summon bird", -0.95, 0.6);// prints the comands
-	glColor3f(0.95, 0.95, 0.95);
+	glColor4f(0.95, 0.95, 0.95,1);
 	if (fire == true) {
 		if (lightningSpawn+2 > framesPassed) {
 			glLineWidth(7);
@@ -534,11 +543,11 @@ void rotate(float angle, float xInitial, float yInitial, float* xFinal, float* y
 	*yFinal = xInitial * sin(angle) + yInitial * cos(angle);
 }
 
-void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[3], float outerColor[3], float startPoint, float endPoint, bool background) {
+void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[4], float outerColor[4], float startPoint, float endPoint, bool background) {
 	glBegin(GL_TRIANGLE_FAN);
-	glColor3f(centerColor[0], centerColor[1], centerColor[2]);
+	glColor4f(centerColor[0], centerColor[1], centerColor[2], centerColor[3]);
 	glVertex2f(centerX, centerY);
-	glColor3f(outerColor[0], outerColor[1], outerColor[2]);
+	glColor4f(outerColor[0], outerColor[1], outerColor[2], outerColor[3]);
 	if (background == false) {
 		for (float i = startPoint; i < endPoint; i += 0.01) {
 			glVertex2f(x + radius * sin(i), y + radius * cos(i));
@@ -688,6 +697,7 @@ void init(void)
 		snow[i].landTime = 0;
 		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 		snow[i].active = true;
+		snow[i].transparancy = ((((float)rand() / RAND_MAX) * 0.2f) + 0.6f);
 	}
 	for (int i = totalSnow + 1; i <= 5000; i++) {
 		snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
@@ -697,6 +707,7 @@ void init(void)
 		snow[i].landTime = 0; //shows it has not landed yet
 		snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 		snow[i].active = false;
+		snow[i].transparancy = ((((float)rand() / RAND_MAX) * 0.2f) + 0.6f);
 	}
 
 	//generating random lanscape where it is random but dosent have any to steep changes by comparing heigh to previous height
@@ -793,7 +804,7 @@ void think(void)
 				snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 				snow[i].location.y = 1.05f;
 				snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
-
+				snow[i].transparancy = ((((float)rand() / RAND_MAX) * 0.2f) + 0.6f);
 				snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
 				if (snowfall == true && true != (fire == true && lightningSpawn + 7 == framesPassed)) {
 					snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
@@ -812,6 +823,7 @@ void think(void)
 						snow[i].location.y = 1.05f;
 						snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
 						snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
+						snow[i].transparancy = ((((float)rand() / RAND_MAX) * 0.2f) + 0.6f);
 						snow[i].active = false;
 						snow[i].dy = 0;
 						totalSnow--;
