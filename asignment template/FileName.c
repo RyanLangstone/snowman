@@ -104,6 +104,19 @@ typedef struct {
 	float theta;
 }bird;
 
+typedef struct {
+	float x2 ;
+	float y2;
+	float A;
+	float B ;
+	float x3;
+	float y3;
+	float A2;
+	float B2;
+	int state;
+}flame;
+flame fireEquation;
+
 Partical  snow[50001];
 float lanscape[200];
 float snowHeight[4][200];
@@ -131,7 +144,7 @@ void main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(FramePixels, FramePixels);
-	//glutInitWindowPosition(2150, 100); // so it displays on monitor, coment out when not uning monitor
+	glutInitWindowPosition(2150, 100); // so it displays on monitor, coment out when not uning monitor
 	glutCreateWindow("Animation");
 
 
@@ -215,23 +228,23 @@ void display(void)
 	glLineWidth(4);
 	glColor4f(0.388235, 0.2, 0.0235, 1);
 	glBegin(GL_LINES);
-	glVertex2f(-0.61 , lanscape[50] + 0.36);
-	glVertex2f(-0.7 , lanscape[50] + 0.25);
+	glVertex2f(-0.61 , lanscape[50] + 0.345);
+	glVertex2f(-0.7 , lanscape[50] + 0.235);
 	glEnd();
 	glBegin(GL_LINES);
-	glVertex2f(-0.39, lanscape[50] + 0.36);
-	glVertex2f(-0.3, lanscape[50] + 0.25);
+	glVertex2f(-0.39, lanscape[50] + 0.345);
+	glVertex2f(-0.3, lanscape[50] + 0.235);
 	glEnd();
 	// main 3 circles for snowman
 	float snowmanCenterColor[4] = { 1,1,1,1 };
 	float snowmanCuterColor[4] = { 0.6902, 0.83137, 0.8196,1 };
 	circle(0.15, -0.5, lanscape[50] + 0.1, -0.5, lanscape[50] + 0.1, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.12, -0.5, lanscape[50] + 0.36, -0.5, lanscape[50] + 0.36, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.07, -0.5, lanscape[50] + 0.54, -0.5, lanscape[50] + 0.54, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.12, -0.5, lanscape[50] + 0.345, -0.5, lanscape[50] + 0.345, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.07, -0.5, lanscape[50] + 0.525, -0.5, lanscape[50] + 0.525, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 	glColor4f(0.388235, 0.2, 0.0235, 1);
 	// the rest of the stick arms, drawn on top of the 3 balls
 	glBegin(GL_LINES);
-		glVertex2f(-0.7, lanscape[50] + 0.25);
+		glVertex2f(-0.7, lanscape[50] + 0.235);
 		glVertex2f(-0.5 + 0.15*sin(290 *M_PI / 180), lanscape[50] + 0.1 + 0.15*cos(290 * M_PI / 180));
 	glEnd();
 	glBegin(GL_LINES);
@@ -248,7 +261,7 @@ void display(void)
 	glEnd();
 
 	glBegin(GL_LINES);
-		glVertex2f(-0.3, lanscape[50] + 0.25);
+		glVertex2f(-0.3, lanscape[50] + 0.235);
 		glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
 	glEnd();
 	glBegin(GL_LINES);
@@ -266,26 +279,26 @@ void display(void)
 	// added buttons, eyes and mouth features
 	snowmanCenterColor[0] = 0; snowmanCenterColor[1] = 0; snowmanCenterColor[2] = 0;
 	snowmanCuterColor[0] = 0; snowmanCuterColor[1] = 0; snowmanCuterColor[2] = 0;
-	circle(0.013, -0.47, lanscape[50] + 0.57, -0.47, lanscape[50] + 0.57, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.013, -0.53, lanscape[50] + 0.57, -0.53, lanscape[50] + 0.57, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.013, -0.47, lanscape[50] + 0.555, -0.47, lanscape[50] + 0.555, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.013, -0.53, lanscape[50] + 0.555, -0.53, lanscape[50] + 0.555, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 
-	circle(0.008, -0.46, lanscape[50] + 0.515, -0.46, lanscape[50] + 0.515, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.008, -0.54, lanscape[50] + 0.515, -0.54, lanscape[50] + 0.515, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.008, -0.48, lanscape[50] + 0.51, -0.48, lanscape[50] + 0.51, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.008, -0.52, lanscape[50] + 0.51, -0.52, lanscape[50] + 0.51, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.008, -0.5, lanscape[50] + 0.505, -0.5, lanscape[50] + 0.505, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.008, -0.46, lanscape[50] + 0.5, -0.46, lanscape[50] + 0.5, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.008, -0.54, lanscape[50] + 0.5, -0.54, lanscape[50] + 0.5, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.008, -0.48, lanscape[50] + 0.495, -0.48, lanscape[50] + 0.495, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.008, -0.52, lanscape[50] + 0.495, -0.52, lanscape[50] + 0.495, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.008, -0.5, lanscape[50] + 0.49, -0.5, lanscape[50] + 0.49, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 
-	circle(0.013, -0.5, lanscape[50] + 0.4, -0.5, lanscape[50] + 0.4, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
-	circle(0.013, -0.5, lanscape[50] + 0.32, -0.5, lanscape[50] + 0.32, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.013, -0.5, lanscape[50] + 0.385, -0.5, lanscape[50] + 0.385, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.013, -0.5, lanscape[50] + 0.305, -0.5, lanscape[50] + 0.305, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 	circle(0.013, -0.5, lanscape[50] + 0.05, -0.5, lanscape[50] + 0.05, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 	circle(0.013, -0.5, lanscape[50] + 0.15, -0.5, lanscape[50] + 0.15, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 	// nose
 	snowmanCenterColor[0] = 0.92157; snowmanCenterColor[1] = 0.53725; snowmanCenterColor[2] = 0.129412;
-	circle(0.01, -0.5, lanscape[50] + 0.5375, -0.5, lanscape[50] + 0.5375, snowmanCenterColor, snowmanCenterColor, 1 * M_PI, 2 * M_PI, firstPass);
+	circle(0.01, -0.5, lanscape[50] + 0.5225, -0.5, lanscape[50] + 0.5225, snowmanCenterColor, snowmanCenterColor, 1 * M_PI, 2 * M_PI, firstPass);
 	glBegin(GL_POLYGON);
-		glVertex2f(-0.5, lanscape[50] + 0.525);
-		glVertex2f(-0.5, lanscape[50] + 0.55);
-		glVertex2f(-0.47, lanscape[50] + 0.56);
+		glVertex2f(-0.5, lanscape[50] + 0.51);
+		glVertex2f(-0.5, lanscape[50] + 0.535);
+		glVertex2f(-0.47, lanscape[50] + 0.545);
 	glEnd();
 	// scarf alternating red and white
 	float scarfColor[4] = {1,0,0,1};
@@ -296,9 +309,9 @@ void display(void)
 		glColor4f(scarfColor[0], scarfColor[1], scarfColor[2], scarfColor[3]);
 
 		glBegin(GL_LINES); 
-		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.21 + i * cos(1.6 * M_PI)); 
-		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.17 + i * cos(1.6 * M_PI)); 
-		alterLanscape(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.21 + i * cos(1.6 * M_PI));
+		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.195 + i * cos(1.6 * M_PI)); 
+		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.15 + i * cos(1.6 * M_PI)); 
+		alterLanscape(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.195 + i * cos(1.6 * M_PI));
 		glEnd(); 
 	}
 
@@ -309,9 +322,9 @@ void display(void)
 			else { scarfColor[1] = 0; scarfColor[2] = 0; }
 		}
 		glColor4f(scarfColor[0], scarfColor[1], scarfColor[2], scarfColor[3]);
-		glVertex2f(-0.285 + 0.355 * sin(i), lanscape[50] + 0.2 + 0.355 * cos(i));
-		glVertex2f(-0.285 + 0.41 * sin(i), lanscape[50] + 0.2 + 0.41 * cos(i));
-		alterLanscape(-0.285 + 0.41 * sin(i), lanscape[50] + 0.2 + 0.41 * cos(i));
+		glVertex2f(-0.285 + 0.355 * sin(i), lanscape[50] + 0.185 + 0.355 * cos(i));
+		glVertex2f(-0.285 + 0.41 * sin(i), lanscape[50] + 0.185 + 0.41 * cos(i));
+		alterLanscape(-0.285 + 0.41 * sin(i), lanscape[50] + 0.185 + 0.41 * cos(i));
 	}
 	glEnd();
 	
@@ -322,8 +335,8 @@ void display(void)
 			else { scarfColor[1] = 0; scarfColor[2] = 0; }
 		}
 		glColor4f(scarfColor[0], scarfColor[1], scarfColor[2], scarfColor[3]);
-		glVertex2f(-0.5 + 0.115 * sin(i), lanscape[50] + 0.6 + 0.115 * cos(i));
-		glVertex2f(-0.5 + 0.17 * sin(i), lanscape[50] + 0.6 + 0.17 * cos(i));
+		glVertex2f(-0.5 + 0.115 * sin(i), lanscape[50] + 0.585 + 0.115 * cos(i));
+		glVertex2f(-0.5 + 0.17 * sin(i), lanscape[50] + 0.585 + 0.17 * cos(i));
 	
 	}
 	glEnd();
@@ -381,15 +394,25 @@ void display(void)
 		glVertex2f(0.505, lanscape[145] + 0.78 -0.69);
 	glEnd();
 
+	
 	if (fire == true && lightningSpawn + 6 < framesPassed) {
 		circleCenter[0] = 1;
 		circleCenter[1] = 0;
 		circleCenter[2] = 0;
-		glColor4f(1, 0, 0,1);
-		circle(0.05, 0.53, lanscape[145], 0.53, lanscape[145], circleCenter, circleCenter, 0, 2* M_PI, false);
+		glColor4f(1, 0, 0, 1);
+		//circle(0.09, 0.53, lanscape[145], 0.53, lanscape[145], circleCenter, circleCenter, 0, 2* M_PI, false);
+		//x=A(y-y2)^2 + x2		vs		y= a(x-x2) + y2
 
+		glBegin(GL_TRIANGLE_FAN);
+		glColor4f(1, 0, 0, 1);
+		glVertex2f(0.53, lanscape[145] + 0.07);
+		glColor4f(1, 0.6196, 0, 0.8);
+		for (float y = lanscape[145] - 0.08; y < fireEquation.y2; y += 0.001) {glVertex2f((float)(fireEquation.A * pow((y - fireEquation.y2), 2) + fireEquation.x2), y);}
+		for (float y = fireEquation.y2; y <= lanscape[145] + 0.15; y += 0.001) { glVertex2f(fireEquation.B * pow((y - fireEquation.y2), 2) + fireEquation.x2, y); }
+		for (float y = lanscape[145] - 0.08; y < fireEquation.y3; y += 0.001) {glVertex2f(fireEquation.A2 * pow((y - fireEquation.y3), 2) + fireEquation.x3, y);}
+		for (float y = fireEquation.y3; y <= lanscape[145] + 0.15; y += 0.001) {glVertex2f(fireEquation.B2 * pow((y - fireEquation.y3), 2) + fireEquation.x3, y);}
+		glEnd();
 	}
-
 	circle(0.0235, 0.522, lanscape[145] + 0.78 -0.72, 0.5175, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
 		glColor4f(0.388235, 0.2, 0.0235,1);
@@ -790,7 +813,16 @@ void idle(void)
 
 	glutPostRedisplay(); // Tell OpenGL there's a new frame ready to be drawn.
 }
-
+void calculateFlame(float x2, float y2, float x3, float y3) {
+	fireEquation.x2 = x2;
+	fireEquation.y2 = y2;
+	fireEquation.A = (0.53 - fireEquation.x2) / pow((lanscape[145] - 0.08 - fireEquation.y2), 2);
+	fireEquation.B = (0.532 - fireEquation.x2) / pow((lanscape[145] + 0.15 - fireEquation.y2), 2);
+	fireEquation.x3 = x3;
+	fireEquation.y3 = y3;
+	fireEquation.A2 = (0.53 - fireEquation.x3) / pow((lanscape[145] - 0.08 - fireEquation.y3), 2);
+	fireEquation.B2 = (0.528 - fireEquation.x3) / pow((lanscape[145] + 0.15 - fireEquation.y3), 2);
+}
 /******************************************************************************
  * Animation-Specific Functions (Add your own functions at the end of this section)
  ******************************************************************************/
@@ -798,6 +830,7 @@ void idle(void)
  /*
 	 Initialise OpenGL and set up our scene before we begin the render loop.
  */
+
 void init(void)
 {
 	srand((unsigned)time(NULL));
@@ -836,17 +869,8 @@ void init(void)
 		}
 		snowHeight[0][i] = snowHeight[1][i] = snowHeight[2][i] = snowHeight[3][i] = lanscape[i] - 0.003;
 	}
-
-	/*//test to devlop bird
-	birds[0].formula.X2 = 0;
-	birds[0].formula.Y2 = 0.3;
-	birds[0].formula.A = 1;
-	birds[0].formula.B = 1;
-	birds[0].location.x = 0;
-	birds[0].location.y = 0.3;
-	birds[0].dx = 0;
-	activeBird[0] = 1;
-	*/
+	calculateFlame(0.53 - 0.1, lanscape[145] + 0.07, 0.53 + 0.1, lanscape[145] + 0.07);
+	fireEquation.state = 0;
 }
 
 void think(void)
@@ -992,5 +1016,30 @@ void think(void)
 			}
 		}
 	}
-
+	
+	if (fireEquation.state == 0) {
+		if (fireEquation.y2 < lanscape[145] + 0.11) {calculateFlame(fireEquation.x2, fireEquation.y2 + 0.001, fireEquation.x3, fireEquation.y3 - 0.001);}
+		else {fireEquation.state = 1;}
+	}
+	else if (fireEquation.state == 1) {
+		if (fireEquation.x2 < 0.48){ calculateFlame(fireEquation.x2+0.01, fireEquation.y2, fireEquation.x3-0.01, fireEquation.y3); }
+		else { fireEquation.state = 2; }
+	}
+	else if (fireEquation.state == 2) {
+		if (fireEquation.x3 <= 0.63) { calculateFlame(fireEquation.x2 - 0.01, lanscape[145] - 0.04, fireEquation.x3 +0.01, lanscape[145] + 0.11); }
+		else { fireEquation.state = 0; }
+	}
+	else if (fireEquation.state == 3) {
+		if (fireEquation.y3 > lanscape[145] -0.04) { calculateFlame(fireEquation.x2, fireEquation.y2 - 0.001, fireEquation.x3, fireEquation.y3 + 0.001); }
+		else { fireEquation.state = 4; }
+	}
+	else if (fireEquation.state == 4) {
+		if (fireEquation.x2 > 0.5) { calculateFlame(fireEquation.x2 - 0.01, fireEquation.y2, fireEquation.x3 = 0.01, fireEquation.y3); }
+		else { fireEquation.state = 5; }
+	}
+	else {
+		if (fireEquation.x3 < 0.63) { calculateFlame(fireEquation.x2 + 0.01, lanscape[145] - 0.04, fireEquation.x3 - 0.01, lanscape[145] + 0.011); }
+		else { fireEquation.state = 0; }
+	}
 }
+//calculateFlame(0.53 - 0.1, lanscape[145] + 0.05, 0.53 + 0.1, lanscape[145] + 0.05);
