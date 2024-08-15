@@ -407,7 +407,7 @@ void display(void)
 
 		glBegin(GL_TRIANGLE_FAN);
 		glColor4f(1, 0, 0, 1);
-		glVertex2f(0.53, lanscape[145] + 0.07 +fireEquation.ctop);
+		glVertex2f(0.53 + 0.022 * sin(fireEquation.angle), lanscape[145] + 0.07 +fireEquation.ctop);
 		glColor4f(1, 0.6196, 0, 0.8);
 		for (float y = lanscape[145] - 0.08; y < fireEquation.y2; y += 0.001) {glVertex2f((float)(fireEquation.A * pow((y - fireEquation.y2), 2) + fireEquation.x2), y);}
 		for (float y = fireEquation.y2; y <= lanscape[145] + 0.15+fireEquation.ctop; y += 0.001) { glVertex2f(fireEquation.B * pow((y - fireEquation.y2), 2) + fireEquation.x2, y); }
@@ -1022,7 +1022,7 @@ void think(void)
 		}
 	}
 	fireEquation.angle += 0.06;
-	calculateFlame(fireEquation.x2, fireEquation.y2, fireEquation.x3, fireEquation.y3,0.53 + 0.05* sin(fireEquation.angle), 0.015 * cos(fireEquation.angle));
+	calculateFlame(fireEquation.x2, fireEquation.y2, fireEquation.x3, fireEquation.y3,0.53 + 0.035* sin(fireEquation.angle), 0.015 * cos(fireEquation.angle));
 	/*if (fireEquation.state == 0) {
 		if (fireEquation.y2 < lanscape[145] + 0.11) {calculateFlame(fireEquation.x2, fireEquation.y2 + 0.001, fireEquation.x3, fireEquation.y3 - 0.001);}
 		else {fireEquation.state = 1;}
