@@ -57,8 +57,9 @@ void keyPressed(unsigned char key, int x, int y);
 void idle(void);
 void mouse(int button, int state, int x, int y);
 void printText(char text[], float x, float y);
-void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[3], float outerColor[3], float startPoint, float endPoint, bool background);
+void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[4], float outerColor[4], float startPoint, float endPoint, bool background);
 void rotate(float angle, float xInitial, float yInitial, float* xFinal, float* yFinal);
+void alterLanscape(float x, float y);
 /******************************************************************************
  * Animation-Specific Function Prototypes (add your own here)
  ******************************************************************************/
@@ -189,7 +190,7 @@ void display(void)
 	
 	num = 0;
 	for (float i = -1; i <= 1; i += 0.0101) {
-		glColor4f(0.557, 0.808, 1, 1);
+		glColor4f(0.557, 0.808, 1, 0.9);
 		glVertex2f(i, 1);
 		glColor4f(0.647, 0.898, 0.9686274, 1);
 		glVertex2f(i, lanscape[num]);
@@ -210,17 +211,124 @@ void display(void)
 			glEnd();
 		}
 	}
-
-
-
-
-
+	// stick arms coming out of snowman
+	glLineWidth(4);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	glBegin(GL_LINES);
+	glVertex2f(-0.61 , lanscape[50] + 0.36);
+	glVertex2f(-0.7 , lanscape[50] + 0.25);
+	glEnd();
+	glBegin(GL_LINES);
+	glVertex2f(-0.39, lanscape[50] + 0.36);
+	glVertex2f(-0.3, lanscape[50] + 0.25);
+	glEnd();
+	// main 3 circles for snowman
 	float snowmanCenterColor[4] = { 1,1,1,1 };
 	float snowmanCuterColor[4] = { 0.6902, 0.83137, 0.8196,1 };
 	circle(0.15, -0.5, lanscape[50] + 0.1, -0.5, lanscape[50] + 0.1, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 	circle(0.12, -0.5, lanscape[50] + 0.36, -0.5, lanscape[50] + 0.36, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
 	circle(0.07, -0.5, lanscape[50] + 0.54, -0.5, lanscape[50] + 0.54, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	// the rest of the stick arms, drawn on top of the 3 balls
+	glBegin(GL_LINES);
+		glVertex2f(-0.7, lanscape[50] + 0.25);
+		glVertex2f(-0.5 + 0.15*sin(290 *M_PI / 180), lanscape[50] + 0.1 + 0.15*cos(290 * M_PI / 180));
+	glEnd();
+	glBegin(GL_LINES);
+		glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
+		glVertex2f(-0.64, lanscape[50] + 0.08);
+	glEnd();
+	glBegin(GL_LINES);
+		glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
+		glVertex2f(-0.6, lanscape[50] + 0.1);
+	glEnd();
+	glBegin(GL_LINES);
+		glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
+		glVertex2f(-0.6, lanscape[50] + 0.16);
+	glEnd();
 
+	glBegin(GL_LINES);
+		glVertex2f(-0.3, lanscape[50] + 0.25);
+		glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
+	glEnd();
+	glBegin(GL_LINES);
+		glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
+		glVertex2f(-0.36, lanscape[50] + 0.08);
+	glEnd();
+	glBegin(GL_LINES);
+	glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
+	glVertex2f(-0.4, lanscape[50] + 0.1);
+	glEnd();
+	glBegin(GL_LINES);
+	glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
+	glVertex2f(-0.4, lanscape[50] + 0.16);
+	glEnd();
+	// added buttons, eyes and mouth features
+	snowmanCenterColor[0] = 0; snowmanCenterColor[1] = 0; snowmanCenterColor[2] = 0;
+	snowmanCuterColor[0] = 0; snowmanCuterColor[1] = 0; snowmanCuterColor[2] = 0;
+	circle(0.013, -0.47, lanscape[50] + 0.57, -0.47, lanscape[50] + 0.57, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.013, -0.53, lanscape[50] + 0.57, -0.53, lanscape[50] + 0.57, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+
+	circle(0.008, -0.46, lanscape[50] + 0.515, -0.46, lanscape[50] + 0.515, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.008, -0.54, lanscape[50] + 0.515, -0.54, lanscape[50] + 0.515, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.008, -0.48, lanscape[50] + 0.51, -0.48, lanscape[50] + 0.51, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.008, -0.52, lanscape[50] + 0.51, -0.52, lanscape[50] + 0.51, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.008, -0.5, lanscape[50] + 0.505, -0.5, lanscape[50] + 0.505, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+
+	circle(0.013, -0.5, lanscape[50] + 0.4, -0.5, lanscape[50] + 0.4, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.013, -0.5, lanscape[50] + 0.32, -0.5, lanscape[50] + 0.32, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.013, -0.5, lanscape[50] + 0.05, -0.5, lanscape[50] + 0.05, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	circle(0.013, -0.5, lanscape[50] + 0.15, -0.5, lanscape[50] + 0.15, snowmanCenterColor, snowmanCuterColor, 0, 2 * M_PI, firstPass);
+	// nose
+	snowmanCenterColor[0] = 0.92157; snowmanCenterColor[1] = 0.53725; snowmanCenterColor[2] = 0.129412;
+	circle(0.01, -0.5, lanscape[50] + 0.5375, -0.5, lanscape[50] + 0.5375, snowmanCenterColor, snowmanCenterColor, 1 * M_PI, 2 * M_PI, firstPass);
+	glBegin(GL_POLYGON);
+		glVertex2f(-0.5, lanscape[50] + 0.525);
+		glVertex2f(-0.5, lanscape[50] + 0.55);
+		glVertex2f(-0.47, lanscape[50] + 0.56);
+	glEnd();
+	// scarf alternating red and white
+	float scarfColor[4] = {1,0,0,1};
+	glLineWidth(1.5); 
+	for (float i = 0.355; i < 0.41; i += 0.008) {
+		if (scarfColor[1] == 0) { scarfColor[1] = 1; scarfColor[2] = 1; }
+		else { scarfColor[1] = 0; scarfColor[2] = 0; }
+		glColor4f(scarfColor[0], scarfColor[1], scarfColor[2], scarfColor[3]);
+
+		glBegin(GL_LINES); 
+		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.21 + i * cos(1.6 * M_PI)); 
+		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.17 + i * cos(1.6 * M_PI)); 
+		alterLanscape(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.21 + i * cos(1.6 * M_PI));
+		glEnd(); 
+	}
+
+	glBegin(GL_QUAD_STRIP);
+	for (float i = 1.6 * M_PI; i <= 1.75 * M_PI; i += 0.01) {
+		if ((int)(i * 102) % 4 == 0) {
+			if (scarfColor[1] == 0) { scarfColor[1] = 1; scarfColor[2] = 1; }
+			else { scarfColor[1] = 0; scarfColor[2] = 0; }
+		}
+		glColor4f(scarfColor[0], scarfColor[1], scarfColor[2], scarfColor[3]);
+		glVertex2f(-0.285 + 0.355 * sin(i), lanscape[50] + 0.2 + 0.355 * cos(i));
+		glVertex2f(-0.285 + 0.41 * sin(i), lanscape[50] + 0.2 + 0.41 * cos(i));
+		alterLanscape(-0.285 + 0.41 * sin(i), lanscape[50] + 0.2 + 0.41 * cos(i));
+	}
+	glEnd();
+	
+	glBegin(GL_QUAD_STRIP);
+	for (float i = 0.8*M_PI; i <= 1.2*M_PI; i += 0.01) {
+		if ((int)(i * 100) % 10 == 0) {
+			if (scarfColor[1] == 0) {scarfColor[1] = 1; scarfColor[2] = 1;}
+			else { scarfColor[1] = 0; scarfColor[2] = 0; }
+		}
+		glColor4f(scarfColor[0], scarfColor[1], scarfColor[2], scarfColor[3]);
+		glVertex2f(-0.5 + 0.115 * sin(i), lanscape[50] + 0.6 + 0.115 * cos(i));
+		glVertex2f(-0.5 + 0.17 * sin(i), lanscape[50] + 0.6 + 0.17 * cos(i));
+	
+	}
+	glEnd();
+
+	
 	// makes snow of depth level 2 render infront of objects
 	for (int i = 0; i < 5000; i++) {
 		if (snow[i].depth == 2 && snow[i].active) {
@@ -231,6 +339,7 @@ void display(void)
 			glEnd();
 		}
 	}
+
 
 
 	float logCenterColor[4] = { 0.6392, 0.3412, 0.0627,1 };
@@ -293,6 +402,8 @@ void display(void)
 		glVertex2f(0.56, lanscape[145] + 0.78 -0.88);
 		glVertex2f(0.535, lanscape[145] + 0.78 -0.7);
 	glEnd();
+
+
 	float stoneCenterColor[4] = { 0.77255, 0.77255, 0.77255,1 };
 	float stoneOuterColor[4] = { 0.67843, 0.65098, 0.62745,1 };
 	circle(0.02, 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.5 * M_PI), 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.5* M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
@@ -309,7 +420,7 @@ void display(void)
 		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, "h");
 	}
 
-	for (int i = 0; i < 30; i++) {
+	for (int i = 0; i < 80; i++) {
 		if (activeBird[i] == 1) {
 			glLoadIdentity();
 			glPushMatrix();
@@ -549,27 +660,29 @@ void circle(float radius, float x, float y, float centerX, float centerY, float 
 	glVertex2f(centerX, centerY);
 	glColor4f(outerColor[0], outerColor[1], outerColor[2], outerColor[3]);
 	if (background == false) {
-		for (float i = startPoint; i < endPoint; i += 0.01) {
+		for (float i = startPoint; i <= endPoint; i += 0.01) {
 			glVertex2f(x + radius * sin(i), y + radius * cos(i));
 		}
 
 	}
 	else {
-		for (float i = startPoint; i < endPoint; i += 0.01) {
+		for (float i = startPoint; i <= endPoint; i += 0.01) {
 			glVertex2f(x + radius * sin(i), y + radius * cos(i));
-			int heightIndex = round((x + radius * sin(i) + 1) * 100);
-			if (snowHeight[1][heightIndex] < y + radius * cos(i)) {
-				snowHeight[1][heightIndex] = y + radius * cos(i) - 0.003;
-			}
-			if (snowHeight[2][heightIndex] > y + radius * cos(i)) {
-				snowHeight[2][heightIndex] = y + radius * cos(i)-0.003;
-				snowHeight[3][heightIndex] = y + radius * cos(i) - 0.003;
-			}
+			alterLanscape(x + radius * sin(i), y + radius * cos(i));
 		}
 	}
 	glEnd();
 }
-
+void alterLanscape(float x, float y) {
+	int heightIndex = round((x +1)* 100);
+	if (snowHeight[1][heightIndex] < y) {
+		snowHeight[1][heightIndex] = y - 0.003;
+	}
+	if (snowHeight[2][heightIndex] > y) {
+		snowHeight[2][heightIndex] = y - 0.003;
+		snowHeight[3][heightIndex] = y - 0.003;
+	}
+ }
 
 /*
 	Called when the OpenGL window has been resized.
@@ -736,14 +849,6 @@ void init(void)
 	*/
 }
 
-/*
-	Advance our animation by FRAME_TIME milliseconds.
-
-	Note: Our template's GLUT idle() callback calls this once before each new
-	frame is drawn, EXCEPT the very first frame drawn after our application
-	starts. Any setup required before the first frame is drawn should be placed
-	in init().
-*/
 void think(void)
 {
 	//srand((unsigned)time(NULL));
