@@ -58,8 +58,8 @@ void idle(void);
 void mouse(int button, int state, int x, int y);
 void printText(char text[], float x, float y);
 void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[4], float outerColor[4], float startPoint, float endPoint, bool background);
-void rotate(float angle, float xInitial, float yInitial, float* xFinal, float* yFinal);
 void alterLanscape(float x, float y);
+void calculateFlame(float y2, float y3);
 /******************************************************************************
  * Animation-Specific Function Prototypes (add your own here)
  ******************************************************************************/
@@ -76,7 +76,7 @@ typedef struct {
 	float x;
 	float y;
 
-}Position2;
+}Position;
 
 typedef struct {
 	// y=a(x-x2)^2 +y2 or // y=b(x-x2)^2 +y2
@@ -87,24 +87,25 @@ typedef struct {
 }Quadric;
 
 typedef struct {
-	Position2 location;
+	Position location;
 	float size;
-	float dy;
-	int landTime;
-	int lifetime;
-	int depth;
-	float transparancy;
-	bool active;
+	float dy; // speed in y diredction
+	int landTime; // time snow landed interms of frames passed
+	int lifetime; // amount of frames snow should stay
+	int depth; // which of the 3 visual layers it should be drawn at
+	float transparancy; 
+	bool active; // wether or not the snow is to be drawn and calculated
 }Partical;
 
 typedef struct {
-	Position2 location;
-	Quadric formula;
-	float dx;
-	float theta;
+	Position location; // bird currnet location
+	Quadric formula; // parth ford bird
+	float dx; // speed in x direction
+	float theta; // angle the bind should be rotated to match gardient
 }bird;
 
 typedef struct {
+	//x=a(y-y2)^2 + x2 or x=b(y-y2)^ + x2	or	x=a(y-y3)^2 + x3 or x=b(y-y3)^ + x3, each equation for a diferent segment of the flame
 	float x2;
 	float y2;
 	float A;
@@ -113,25 +114,25 @@ typedef struct {
 	float y3;
 	float A2;
 	float B2;
-	float angle;
-	int state;
+	float angle; // angle around the circular parth that the flames peak is at (in radians)
+	int state; // what state the flame animation is at
 
 }flame;
 flame fireEquation;
 
 
 Partical  snow[50001];
+int totalSnow = 50;
+bool snowfall = true; // wether or not it should be snowing
 float lanscape[200];
-float snowHeight[4][200];
+float snowHeight[4][200]; // 3 layers of heigts for snow positions and a 4th as a save of the standard original
 
-bird birds[31];
-int activeBird[31];
+bird birds[51];
+int activeBird[51];
 int totalActiveBirds = 0;
-float angle = M_PI / 4;
 
 int framesPassed = 1;
-int totalSnow = 50;
-bool snowfall = true;
+
 GLfloat clickpos[2] = { 0,0 };
 
 float lightningPoints[5];
@@ -444,7 +445,7 @@ void display(void)
 		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, "h");
 	}
 
-	for (int i = 0; i < 80; i++) {
+	for (int i = 0; i < 50; i++) {
 		if (activeBird[i] == 1) {
 			glLoadIdentity();
 			glPushMatrix();
@@ -452,7 +453,6 @@ void display(void)
 
 			glRotatef(birds[i].theta, 0.0, 0.0, 1.0);
 			//glTranslatef(-birds[i].location.x, -birds[i].location.y, 0);
-			float x, y;
 			float birdCenterColor[4] = { 0.2118, 0.1529, 0,1 };
 			float birdOuterColor[4] = { 0.2118, 0.1529, 0,1 };
 			glColor4f(0.2118, 0.1529, 0, 1);
@@ -460,83 +460,78 @@ void display(void)
 
 
 			glBegin(GL_POLYGON);
-			rotate(0, 0.035355, 0.017678, &x, &y);
-			glVertex2f(0 + x, 0 + y);
-			glVertex2f(0 - x, 0 + y);
-			glVertex2f(0 - x, 0 - y);
-			glVertex2f(0 + x, 0 - y);
+			glVertex2f(0.035355, 0.017678);
+			glVertex2f(-0.035355, 0.017678);
+			glVertex2f(-0.035355, -0.017678);
+			glVertex2f(0.035355, -0.017678);
 			glEnd();
 
 			glBegin(GL_POLYGON);
-			rotate(0, 0.008445, 0.035606602, &x, &y);
-			glVertex2f(0 + x, 0 + y);
-			rotate(0, -0.030445, 0.035606602, &x, &y);
-			glVertex2f(0 + x, 0 + y);
-			rotate(0, -0.030445, 0.014393398, &x, &y);
-			glVertex2f(0 + x, 0 + y);
-			rotate(0, 0.008445, 0.014393398, &x, &y);
-			glVertex2f(0 + x, 0 + y);
+			glVertex2f(0.008445, 0.035606602);
+			glVertex2f(-0.030445, 0.035606602);
+			glVertex2f(-0.030445, 0.014393398);
+			glVertex2f(0.008445, 0.014393398);
 			glEnd();
 
 			glBegin(GL_TRIANGLES);
-			glVertex2f(0 + 0.005, 0 + 0.045);
-			glVertex2f(0 + 0.005, 0 + 0.015);
-			glVertex2f(0 + 0.02, 0 + 0.015);
+			glVertex2f(0.005, 0.045);
+			glVertex2f(0.005, 0.015);
+			glVertex2f(0.02, 0.015);
 			glEnd();
 
 			glBegin(GL_TRIANGLES);
-			glVertex2f(0 - 0.035, 0 + 0.03);
-			glVertex2f(0 + 0.01, 0 + 0.03);
-			glVertex2f(0 + 0.01, 0 + 0.063);
+			glVertex2f(-0.035, 0.03);
+			glVertex2f(0.01, 0.03);
+			glVertex2f(0.01, 0.063);
 			glEnd();
 
 			glBegin(GL_POLYGON);
-			glVertex2f(0 + 0.035, 0 + 0.01);
-			glVertex2f(0 + 0.06, 0 + 0.01);
-			glVertex2f(0 + 0.06, 0 + 0.02);
-			glVertex2f(0 + 0.035, 0 + 0.02);
+			glVertex2f(0.035, 0.01);
+			glVertex2f(0.06, 0.01);
+			glVertex2f(0.06, 0.02);
+			glVertex2f(0.035, 0.02);
 			glEnd();
 
 			glBegin(GL_POLYGON);
-			glVertex2f(0 - 0.05, 0 + 0.0025);
-			glVertex2f(0 - 0.0625, 0 + 0.0025);
-			glVertex2f(0 - 0.0625, 0 + 0.015);
-			glVertex2f(0 + 0.05, 0 + 0.015);
+			glVertex2f(-0.05, 0.0025);
+			glVertex2f(-0.0625, 0.0025);
+			glVertex2f(-0.0625, 0.015);
+			glVertex2f(0.05, 0.015);
 			glEnd();
 
 			glBegin(GL_POLYGON);
-			glVertex2f(0 - 0.05, 0 + 0.02);
-			glVertex2f(0 - 0.06, 0 + 0.02);
-			glVertex2f(0 - 0.06, 0 + 0.015);
-			glVertex2f(0 + 0.05, 0 + 0.015);
+			glVertex2f(-0.05, 0.02);
+			glVertex2f(-0.06, 0.02);
+			glVertex2f(-0.06, 0.015);
+			glVertex2f(0.05, 0.015);
 			glEnd();
 
 			glBegin(GL_TRIANGLES);
-			glVertex2f(0 - 0.045, 0 + 0.02);
-			glVertex2f(0 - 0.065, 0 + 0.0175);
-			glVertex2f(0 - 0.065, 0 + 0.0275);
+			glVertex2f(-0.045, 0.02);
+			glVertex2f(-0.065, 0.0175);
+			glVertex2f(-0.065, 0.0275);
 			glEnd();
 
 
 			glColor4f(0, 0, 0, 1);
 			glBegin(GL_TRIANGLES);
-			glVertex2f(0 + 0.06, 0 + 0.01);
-			glVertex2f(0 + 0.06, 0 + 0.02);
-			glVertex2f(0 + 0.07, 0 + 0.012);
+			glVertex2f(0.06, 0.01);
+			glVertex2f(0.06, 0.02);
+			glVertex2f(0.07, 0.012);
 			glEnd();
 			glColor4f(0.2118, 0.1529, 0, 1);
 
-			circle(0.005, 0 - 0.0625, 0 + 0.007375, 0 - 0.0625, 0 + 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
-			circle(0.00375, 0 - 0.065, 0 + 0.02375, 0 - 0.065, 0 + 0.02375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
-			circle(0.0275, 0 - 0.005, 0 + (0.035 / sin(M_PI / 4)) * sin(angle), 0 + (0.005 / sin(M_PI / 4)) * cos(angle), 0 + (0.03 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.25 * M_PI, 2.15 * M_PI, false);
-			circle(0.03, 0 - 0.035, 0 + 0.05, 0 - 0.05, 0 + 0.01, birdCenterColor, birdOuterColor, 1 * M_PI, 1.17 * M_PI, false);
-			circle(0.3, 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 + (0.277 / sin(M_PI / 4)) * sin(angle), 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 + (-0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1 * M_PI - M_PI / 4 + angle, 1.055 * M_PI - M_PI / 4 + angle, false);
-			circle(0.052, 0 - (0.00 / sin(M_PI / 4)) * cos(angle), 0 + (0.022 / sin(M_PI / 4)) * sin(angle), 0 - (0.03 / sin(M_PI / 4)) * cos(angle), 0 + (0.018 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.2 * M_PI - M_PI / 4 + angle, 1.46 * M_PI - M_PI / 4 + angle, false);
-			circle(0.02, 0 + 0.056569 * cos(angle), 0 + (0.018 / sin(M_PI / 4)) * sin(angle), 0 + (0.04 / sin(M_PI / 4)) * cos(angle), 0 + (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.45 * M_PI, 2.55 * M_PI, false);
-			circle(0.055, 0 + 0.120202 * cos(angle), 0 - (0.04 / sin(M_PI / 4)) * sin(angle), 0 + (0.035 / sin(M_PI / 4)) * cos(angle), 0 + (0.01 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, 1.625 * M_PI - M_PI / 4 + angle, 1.9 * M_PI - M_PI / 4 + angle, false);
-			circle(0.02, 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 - (0.003 / sin(M_PI / 4)) * sin(angle), 0 + (0.015 / sin(M_PI / 4)) * cos(angle), 0 - (0.015 / sin(M_PI / 4)) * sin(angle), birdCenterColor, birdOuterColor, M_PI - M_PI / 4, 1 * M_PI - M_PI / 4 + angle, false);
+			circle(0.005, -0.0625, 0.007375, -0.0625, 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
+			circle(0.00375, -0.065, 0.02375, -0.065, 0.02375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
+			circle(0.0275, -0.005, 0.035 , 0.005, 0.03, birdCenterColor, birdOuterColor, 1.25 * M_PI, 2.15 * M_PI, false);
+			circle(0.03, -0.035, 0.05, -0.05, 0.01, birdCenterColor, birdOuterColor, 1 * M_PI, 1.17 * M_PI, false);
+			circle(0.3, 0.015, 0.277, 0.015, -0.015, birdCenterColor, birdOuterColor, 1 * M_PI, 1.055 * M_PI, false);
+			circle(0.052, 0, 0.022, -0.03, 0.018, birdCenterColor, birdOuterColor, 1.2 * M_PI, 1.46 * M_PI, false);
+			circle(0.02, 0.04, 0.018, 0.04, 0.015, birdCenterColor, birdOuterColor, 1.45 * M_PI, 2.55 * M_PI, false);
+			circle(0.055, 0.085, -0.04, 0.035, 0.01, birdCenterColor, birdOuterColor, 1.625 * M_PI, 1.9 * M_PI, false);
+			circle(0.02, 0.015, -0.003, 0.015, -0.015, birdCenterColor, birdOuterColor, M_PI *3 / 4, 1 * M_PI, false);
 			float eyeColour[4] = { 1,1,1,1 };
-			circle(0.004, 0 + 0.045, 0 + 0.025, 0 + 0.045, 0 + 0.025, eyeColour, eyeColour, 0 * M_PI, 2 * M_PI, false);
+			circle(0.004, 0.045, 0.025, 0.045, 0.025, eyeColour, eyeColour, 0 * M_PI, 2 * M_PI, false);
 
 			glPopMatrix();
 		}
@@ -660,51 +655,44 @@ void display(void)
 			glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
 			glEnd();
 		}
-
 	}
-
-
-
 	glutSwapBuffers();
 }
 void printText(char text[], float x, float y) {
+	//prints passed in text 1 charicter at a time at specified locations
 	for (int i = 0; i < strlen(text); i++) {
 		glRasterPos2f(x + 0.0225 * i, y);
 		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, text[i]);
 	}
 }
 
-void rotate(float angle, float xInitial, float yInitial, float* xFinal, float* yFinal) {
-	*xFinal = xInitial * cos(angle) - yInitial * sin(angle);
-	*yFinal = xInitial * sin(angle) + yInitial * cos(angle);
-}
-
 void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[4], float outerColor[4], float startPoint, float endPoint, bool background) {
+	// function to do all circles and arcs
 	glBegin(GL_TRIANGLE_FAN);
-	glColor4f(centerColor[0], centerColor[1], centerColor[2], centerColor[3]);
+	glColor4f(centerColor[0], centerColor[1], centerColor[2], centerColor[3]); // color of center vertex
 	glVertex2f(centerX, centerY);
 	glColor4f(outerColor[0], outerColor[1], outerColor[2], outerColor[3]);
-	if (background == false) {
+	if (background == false) { // checkes if it is suposed to effect snow landing positions
 		for (float i = startPoint; i <= endPoint; i += 0.01) {
 			glVertex2f(x + radius * sin(i), y + radius * cos(i));
 		}
-
 	}
 	else {
 		for (float i = startPoint; i <= endPoint; i += 0.01) {
 			glVertex2f(x + radius * sin(i), y + radius * cos(i));
-			alterLanscape(x + radius * sin(i), y + radius * cos(i));
+			alterLanscape(x + radius * sin(i), y + radius * cos(i)); // makes the circle effect snow landing positions
 		}
 	}
 	glEnd();
 }
 void alterLanscape(float x, float y) {
+	// changes the height of the snow landing positions based on the geometry of added shaped
 	int heightIndex = round((x + 1) * 100);
 	if (snowHeight[1][heightIndex] < y) {
-		snowHeight[1][heightIndex] = y - 0.003;
+		snowHeight[1][heightIndex] = y - 0.003; // alows things to be landed ontop of
 	}
 	if (snowHeight[2][heightIndex] > y) {
-		snowHeight[2][heightIndex] = y - 0.003;
+		snowHeight[2][heightIndex] = y - 0.003; // makes the snof fall infront and behind the object at the same height as the object base rather than the original lanscape height
 		snowHeight[3][heightIndex] = y - 0.003;
 	}
 }
@@ -720,6 +708,7 @@ void reshape(int width, int h)
 	Called each time a character key (e.g. a letter, number, or symbol) is pressed.
 */
 void mouse(int button, int state, int x, int y) {
+	// determined if left buton is clicked and if so saves the position to clickpos and calls birdfunc()
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 		clickpos[0] = ((GLfloat)x / (GLfloat)FramePixels) * 2 - 1;
 		clickpos[1] = ((GLfloat)y / (GLfloat)FramePixels) * -2 + 1;
@@ -727,15 +716,16 @@ void mouse(int button, int state, int x, int y) {
 	}
 }
 void birdfunc(void) {
+	// generates 2 random rumbers relative to the click position and makes those quordinates, and creates 2 quadratics creating a flightpath based on those 3 points, also intiitalises all other values of birds
 	float p1y = (((float)rand() / RAND_MAX) * 0.5f);
 	p1y = p1y * (clickpos[0] + 1);
-	if (rand() % 2 == 1) { p1y = -p1y; }
-	p1y += clickpos[1];
+	if (rand() % 2 == 1) { p1y = -p1y; }// 50% chance that it is negative
+	p1y += clickpos[1]; // makes it a y position relative to the click y
 	float p2y = (((float)rand() / RAND_MAX) * 0.5f);
 	p2y = p2y * ((clickpos[0] - 1) * -1);
 	if (rand() % 2 == 1) { p2y = -p2y; }
-	p2y += clickpos[1];
-	for (int i = 0; i < 30; i++) {
+	p2y += clickpos[1]; // makes it a y position relative to the click y
+	for (int i = 0; i < 50; i++) { // loops though all posible bird instance and initialses values to the first non active one
 		if (activeBird[i] == 0) {
 			totalActiveBirds++;
 			activeBird[i] = 1;
@@ -744,8 +734,8 @@ void birdfunc(void) {
 			birds[i].formula.A = (p1y - birds[i].formula.Y2) / pow((-1 - birds[i].formula.X2), 2);
 			birds[i].formula.B = (p2y - birds[i].formula.Y2) / pow((1 - birds[i].formula.X2), 2);
 			birds[i].location.x = -1.1;
-			birds[i].location.y = p1y;
-			birds[i].dx = ((((float)rand() / RAND_MAX) * 0.02f) + 0.0055f);
+			birds[i].location.y = p1y; // setting initial location of bird to the random point
+			birds[i].dx = ((((float)rand() / RAND_MAX) * 0.02f) + 0.0055f); // random speed of bird
 			birds[i].theta = 0;
 			break;
 		}
@@ -753,12 +743,13 @@ void birdfunc(void) {
 }
 
 void lightning() {
+	// generates 3 random points pluss the fixed point of the lightning parth
 	lightningSpawn = framesPassed;
 	lightningPoints[4] = 0.53;
 	int multiplyer = 1;
 	if (rand() % 2 == 1) { multiplyer = -1; }
 	for (int i = 3; i >= 0; i--) {
-		lightningPoints[i] = ((((float)rand() / RAND_MAX) * 0.25f) + 0.1f) * (pow(-1, i) * multiplyer) + lightningPoints[i + 1];
+		lightningPoints[i] = ((((float)rand() / RAND_MAX) * 0.25f) + 0.1f) * (pow(-1, i) * multiplyer) + lightningPoints[i + 1]; // makes it so that each point is alternating directions from the previous
 	}
 
 
@@ -767,14 +758,14 @@ void lightning() {
 void keyPressed(unsigned char key, int x, int y)
 {
 	switch (tolower(key)) {
-	case KEY_Q:
-		exit(0);
+	case KEY_Q: // exits program on q pressed
+		exit(0); 
 		break;
-	case KEY_S:
+	case KEY_S: // toggles snow on s pressed
 		if (snowfall == true) { snowfall = false; }
 		else { snowfall = true; }
 		break;
-	case KEY_F:
+	case KEY_F: // togles fire on f press, plus calculates the lightning points in needed
 		if (fire == true) { fire = false; }
 		else { fire = true; lightning(); }
 	}
@@ -811,9 +802,10 @@ void idle(void)
 }
 
 void calculateFlame( float y2, float y3) {
+	// calculates the current 4 equations values based on the current y values and angle of peak
 	fireEquation.y2 = y2;
-	fireEquation.A = (0.53 - fireEquation.x2) / pow((lanscape[145] - 0.08 - fireEquation.y2), 2);
-	fireEquation.B = (0.53 + 0.035 * sin(fireEquation.angle) + 0.003 - fireEquation.x2) / pow((lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle) - fireEquation.y2), 2);
+	fireEquation.A = (0.53 - fireEquation.x2) / pow((lanscape[145] - 0.08 - fireEquation.y2), 2); // A,b,A2,B2 all change the rate of curviture of their respective functions (all of them are for different curves)
+	fireEquation.B = (0.53 + 0.035 * sin(fireEquation.angle) + 0.003 - fireEquation.x2) / pow((lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle) - fireEquation.y2), 2); // fireEquation.angle is to do with changing peak position
 	fireEquation.y3 = y3;
 	fireEquation.A2 = (0.53 - fireEquation.x3) / pow((lanscape[145] - 0.08 - fireEquation.y3), 2);
 	fireEquation.B2 = (0.53 + 0.035 * sin(fireEquation.angle) - 0.003 - fireEquation.x3) / pow((lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle) - fireEquation.y3), 2);
