@@ -113,12 +113,13 @@ typedef struct {
 	float y3;
 	float A2;
 	float B2;
-	float angle;
-	float ctop;
-	int state;
+	
 }flame;
-flame fireEquation;
-
+flame fireEquation[2];
+int fireOrder[2];
+float fireAngle;
+float fireCtop;
+int fireState;
 Partical  snow[50001];
 float lanscape[200];
 float snowHeight[4][200];
@@ -146,7 +147,7 @@ void main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(FramePixels, FramePixels);
-	glutInitWindowPosition(2150, 100); // so it displays on monitor, coment out when not uning monitor
+	//glutInitWindowPosition(2150, 100); // so it displays on monitor, coment out when not uning monitor
 	glutCreateWindow("Animation");
 
 
@@ -396,8 +397,20 @@ void display(void)
 		glVertex2f(0.505, lanscape[145] + 0.78 -0.69);
 	glEnd();
 
-	
-	if (fire == true && lightningSpawn + 6 < framesPassed) {
+	circle(0.0235, 0.522, lanscape[145] + 0.78 - 0.72, 0.5175, lanscape[145] + 0.78 - 0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, false);
+	glBegin(GL_QUAD_STRIP);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	glVertex2f(0.51, lanscape[145] + 0.78 - 0.89);
+	glVertex2f(0.50, lanscape[145] + 0.78 - 0.71);
+	glColor4f(0.6392, 0.3412, 0.0627, 1);
+	glVertex2f(0.535, lanscape[145] + 0.78 - 0.885);
+	glVertex2f(0.5175, lanscape[145] + 0.78 - 0.705);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	glVertex2f(0.56, lanscape[145] + 0.78 - 0.88);
+	glVertex2f(0.535, lanscape[145] + 0.78 - 0.7);
+	glEnd();
+
+	if (fire == true && lightningSpawn + 15 < framesPassed) {
 		circleCenter[0] = 1;
 		circleCenter[1] = 0;
 		circleCenter[2] = 0;
@@ -407,26 +420,24 @@ void display(void)
 
 		glBegin(GL_TRIANGLE_FAN);
 		glColor4f(1, 0, 0, 1);
-		glVertex2f(0.53 + 0.022 * sin(fireEquation.angle), lanscape[145] + 0.07 +fireEquation.ctop);
+		glVertex2f(0.53 + 0.022 * sin(fireAngle), lanscape[145] + 0.07 +fireCtop);
 		glColor4f(1, 0.6196, 0, 0.8);
-		for (float y = lanscape[145] - 0.08; y < fireEquation.y2; y += 0.001) {glVertex2f((float)(fireEquation.A * pow((y - fireEquation.y2), 2) + fireEquation.x2), y);}
-		for (float y = fireEquation.y2; y <= lanscape[145] + 0.15+fireEquation.ctop; y += 0.001) { glVertex2f(fireEquation.B * pow((y - fireEquation.y2), 2) + fireEquation.x2, y); }
-		for (float y = lanscape[145] - 0.08; y < fireEquation.y3; y += 0.001) {glVertex2f(fireEquation.A2 * pow((y - fireEquation.y3), 2) + fireEquation.x3, y);}
-		for (float y = fireEquation.y3; y <= lanscape[145] + 0.15 + fireEquation.ctop; y += 0.001) {glVertex2f(fireEquation.B2 * pow((y - fireEquation.y3), 2) + fireEquation.x3, y);}
+		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[0]].y2; y += 0.001) {glVertex2f((float)(fireEquation[fireOrder[0]].A * pow((y - fireEquation[fireOrder[0]].y2), 2) + fireEquation[fireOrder[0]].x2), y);}
+		for (float y = fireEquation[fireOrder[0]].y2; y <= lanscape[145] + 0.18+fireCtop; y += 0.001) { glVertex2f(fireEquation[fireOrder[0]].B * pow((y - fireEquation[fireOrder[0]].y2), 2) + fireEquation[fireOrder[0]].x2, y); }
+		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[0]].y3; y += 0.001) {glVertex2f(fireEquation[fireOrder[0]].A2 * pow((y - fireEquation[fireOrder[0]].y3), 2) + fireEquation[fireOrder[0]].x3, y);}
+		for (float y = fireEquation[fireOrder[0]].y3; y <= lanscape[145] + 0.18 + fireCtop; y += 0.001) {glVertex2f(fireEquation[fireOrder[0]].B2 * pow((y - fireEquation[fireOrder[0]].y3), 2) + fireEquation[fireOrder[0]].x3, y);}
 		glEnd();
+		/*glBegin(GL_TRIANGLE_FAN);
+		glColor4f(1, 0, 0, 1);
+		glVertex2f(0.53 + 0.022 * sin(fireAngle), lanscape[145] + 0.07 + fireCtop);
+		glColor4f(1, 0.6196, 0, 1);
+		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[1]].y2; y += 0.001) { glVertex2f((float)(fireEquation[fireOrder[1]].A * pow((y - fireEquation[fireOrder[1]].y2), 2) + fireEquation[fireOrder[1]].x2), y); }
+		for (float y = fireEquation[fireOrder[1]].y2; y <= lanscape[145] + 0.15 + fireCtop; y += 0.001) { glVertex2f(fireEquation[fireOrder[1]].B * pow((y - fireEquation[fireOrder[1]].y2), 2) + fireEquation[fireOrder[1]].x2, y); }
+		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[1]].y3; y += 0.001) { glVertex2f(fireEquation[fireOrder[1]].A2 * pow((y - fireEquation[fireOrder[1]].y3), 2) + fireEquation[fireOrder[1]].x3, y); }
+		for (float y = fireEquation[fireOrder[1]].y3; y <= lanscape[145] + 0.15 + fireCtop; y += 0.001) { glVertex2f(fireEquation[fireOrder[1]].B2 * pow((y - fireEquation[fireOrder[1]].y3), 2) + fireEquation[fireOrder[1]].x3, y); }
+		glEnd();*/
 	}
-	circle(0.0235, 0.522, lanscape[145] + 0.78 -0.72, 0.5175, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, false);
-	glBegin(GL_QUAD_STRIP);
-		glColor4f(0.388235, 0.2, 0.0235,1);
-		glVertex2f(0.51, lanscape[145] + 0.78 -0.89);
-		glVertex2f(0.50, lanscape[145] + 0.78 -0.71);
-		glColor4f(0.6392, 0.3412, 0.0627,1);
-		glVertex2f(0.535, lanscape[145] + 0.78 -0.885);
-		glVertex2f(0.5175, lanscape[145] + 0.78 -0.705);
-		glColor4f(0.388235, 0.2, 0.0235,1);
-		glVertex2f(0.56, lanscape[145] + 0.78 -0.88);
-		glVertex2f(0.535, lanscape[145] + 0.78 -0.7);
-	glEnd();
+	
 
 
 	float stoneCenterColor[4] = { 0.77255, 0.77255, 0.77255,1 };
@@ -816,16 +827,16 @@ void idle(void)
 	glutPostRedisplay(); // Tell OpenGL there's a new frame ready to be drawn.
 }
 
-void calculateFlame(float x2, float y2, float x3, float y3,float top,float ctop) {
-	fireEquation.x2 = x2;
-	fireEquation.y2 = lanscape[145] + 0.07 + ctop;
-	fireEquation.ctop = ctop;
-	fireEquation.A = (0.53 - fireEquation.x2) / pow((lanscape[145] - 0.08 - fireEquation.y2), 2);
-	fireEquation.B = (top - fireEquation.x2) / pow((lanscape[145] + 0.15+ctop - fireEquation.y2), 2);
-	fireEquation.x3 = x3;
-	fireEquation.y3 = lanscape[145] + 0.0 + ctop;
-	fireEquation.A2 = (0.53 - fireEquation.x3) / pow((lanscape[145] - 0.08 - fireEquation.y3), 2);
-	fireEquation.B2 = (top  - fireEquation.x3) / pow((lanscape[145] + 0.15+ctop - fireEquation.y3), 2);
+void calculateFlame(float x2, float y2, float x3, float y3,float top,float ctop, int layer) {
+	fireEquation[layer].x2 = x2;
+	fireEquation[layer].y2 = y2;
+	fireCtop = ctop;
+	fireEquation[layer].A = (0.53 - fireEquation[layer].x2) / pow((lanscape[145] - 0.08 - fireEquation[layer].y2), 2);
+	fireEquation[layer].B = (top+0.003 - fireEquation[layer].x2) / pow((lanscape[145] + 0.18+ctop - fireEquation[layer].y2), 2);
+	fireEquation[layer].x3 = x3;
+	fireEquation[layer].y3 = y3;
+	fireEquation[layer].A2 = (0.53 - fireEquation[layer].x3) / pow((lanscape[145] - 0.08 - fireEquation[layer].y3), 2);
+	fireEquation[layer].B2 = (top-0.003  - fireEquation[layer].x3) / pow((lanscape[145] + 0.18+ctop - fireEquation[layer].y3), 2);
 }
 /******************************************************************************
  * Animation-Specific Functions (Add your own functions at the end of this section)
@@ -873,9 +884,11 @@ void init(void)
 		}
 		snowHeight[0][i] = snowHeight[1][i] = snowHeight[2][i] = snowHeight[3][i] = lanscape[i] - 0.003;
 	}
-	calculateFlame(0.53 - 0.1, lanscape[145] + 0.07, 0.53 + 0.1, lanscape[145] + 0.07,0.53,0);
-	fireEquation.state = 0;
-	fireEquation.angle = 0;
+	calculateFlame(0.53 - 0.1, lanscape[145] + 0.07, 0.53 + 0.1, lanscape[145] + 0.07,0.53,0,0);
+	calculateFlame(0.53 - 0.02, lanscape[145] + 0.07, 0.53 + 0.02, lanscape[145] + 0.07, 0.53, 0, 1);
+	fireState = 0;
+	fireAngle = 0;
+	fireOrder[0] = 0; fireOrder[1] = 1;
 }
 
 void think(void)
@@ -1021,31 +1034,39 @@ void think(void)
 			}
 		}
 	}
-	fireEquation.angle += 0.06;
-	calculateFlame(fireEquation.x2, fireEquation.y2, fireEquation.x3, fireEquation.y3,0.53 + 0.035* sin(fireEquation.angle), 0.015 * cos(fireEquation.angle));
-	/*if (fireEquation.state == 0) {
-		if (fireEquation.y2 < lanscape[145] + 0.11) {calculateFlame(fireEquation.x2, fireEquation.y2 + 0.001, fireEquation.x3, fireEquation.y3 - 0.001);}
-		else {fireEquation.state = 1;}
+	fireAngle += 0.06;  
+	printf("fire state :%d", fireState);
+	//calculateFlame(fireEquation.x2, fireEquation.y2, fireEquation.x3, fireEquation.y3,0.53 + 0.035* sin(fireAngle), 0.015 * cos(fireAngle));
+	if (fireState == 0) {
+		if (fireEquation[0].y2 < lanscape[145] + 0.09) {
+			calculateFlame(fireEquation[0].x2, fireEquation[0].y2 + 0.001, fireEquation[0].x3, fireEquation[0].y3 - 0.001, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle),0);
+			//calculateFlame(fireEquation[1].x2, fireEquation[1].y2 - 0.001, fireEquation[1].x3, fireEquation[1].y3 + 0.001, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle),1);
+
+		}
+		else {fireState = 1;}
 	}
-	else if (fireEquation.state == 1) {
-		if (fireEquation.x2 < 0.48){ calculateFlame(fireEquation.x2+0.01, fireEquation.y2, fireEquation.x3-0.01, fireEquation.y3); }
-		else { fireEquation.state = 2; }
-	}
-	else if (fireEquation.state == 2) {
-		if (fireEquation.x3 <= 0.63) { calculateFlame(fireEquation.x2 - 0.01, lanscape[145] - 0.04, fireEquation.x3 +0.01, lanscape[145] + 0.11); }
-		else { fireEquation.state = 0; }
-	}
-	else if (fireEquation.state == 3) {
-		if (fireEquation.y3 > lanscape[145] -0.04) { calculateFlame(fireEquation.x2, fireEquation.y2 - 0.001, fireEquation.x3, fireEquation.y3 + 0.001); }
-		else { fireEquation.state = 4; }
-	}
-	else if (fireEquation.state == 4) {
-		if (fireEquation.x2 > 0.5) { calculateFlame(fireEquation.x2 - 0.01, fireEquation.y2, fireEquation.x3 = 0.01, fireEquation.y3); }
-		else { fireEquation.state = 5; }
-	}
-	else {
-		if (fireEquation.x3 < 0.63) { calculateFlame(fireEquation.x2 + 0.01, lanscape[145] - 0.04, fireEquation.x3 - 0.01, lanscape[145] + 0.011); }
-		else { fireEquation.state = 0; }
+	/*else if (fireState == 1) {
+		if (fireEquation[0].x2 < 0.51) { 
+			calculateFlame(fireEquation[0].x2 + 0.001, fireEquation[0].y2, fireEquation[0].x3 - 0.001, fireEquation[0].y3, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle),0);
+			calculateFlame(fireEquation[1].x2 - 0.001, fireEquation[1].y2, fireEquation[1].x3 + 0.001, fireEquation[1].y3, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle),1);
+			if (fireEquation[0].x2 < 0.48) {
+				if (fireOrder[0] == 0) {
+					fireOrder[0] = 1; fireOrder[1] = 0;
+				}
+				else {
+					fireOrder[0] = 0; fireOrder[1] = 1;
+				}
+			}
+
+		}
+		else { fireState = 2; }
 	}*/
+	else{
+		if (fireEquation[0].y3 < lanscape[145] + 0.09) {
+			//alculateFlame(fireEquation[1].x2, fireEquation[1].y2 - 0.001, fireEquation[1].x3, fireEquation[1].y3 + 0.001, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle),0);
+			calculateFlame(fireEquation[0].x2, fireEquation[0].y2 - 0.0005, fireEquation[0].x3, fireEquation[0].y3 + 0.0005, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle), 0);
+		}
+		else { fireState = 0; }
+	}
 }
 //calculateFlame(0.53 - 0.1, lanscape[145] + 0.05, 0.53 + 0.1, lanscape[145] + 0.05);
