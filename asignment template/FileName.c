@@ -23,6 +23,7 @@
 
 // Ideal time each frame should be displayed for (in milliseconds).
 const unsigned int FRAME_TIME = 1000 / TARGET_FPS;
+int framesPassed = 0; // main variable used for initating things at specific times and other time related events
 
 // Frame time in fractional seconds.
 // Note: This is calculated to accurately reflect the truncated integer value of
@@ -38,9 +39,6 @@ const unsigned int FramePixels = 700;
 /******************************************************************************
  * Keyboard Input Handling Setup
  ******************************************************************************/
-
- // Define all character keys used for input (add any new key definitions here).
- // Note: USE ONLY LOWERCASE CHARACTERS HERE. The keyboard handler provided converts all
  // characters typed by the user to lowercase, so the SHIFT key is ignored.
 
 #define KEY_F			102 // q key.
@@ -68,19 +66,15 @@ void birdfunc();
 void printText(char text[], float x, float y);
 void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[4], float outerColor[4], float startPoint, float endPoint, bool background);
 void alterLanscape(float x, float y);
+void lightning();
 void calculateFlame(float y2, float y3);
 /******************************************************************************
- * Animation-Specific Setup (Add your own definitions, constants, and globals here)
+ * Animation-Specific Setup
  ******************************************************************************/
-
-int framesPassed = 1;
-
-typedef struct {
+typedef struct { // (x,y) location of something
 	float x;
 	float y;
-
 }Position;
-
 typedef struct {
 	// y=a(x-x2)^2 +y2 or // y=b(x-x2)^2 +y2
 	float A;
@@ -88,7 +82,6 @@ typedef struct {
 	float X2;
 	float Y2;
 }Quadric;
-
 typedef struct {
 	Position location;
 	float size;
@@ -121,25 +114,25 @@ typedef struct {
 	int state; // what state the flame animation is at
 
 }flame;
-flame fireEquation;
-
-
+//snow variables
 Partical  snow[5000];
 int totalSnow = 50;
 bool snowfall = true; // wether or not it should be snowing
 float lanscape[201];
 float snowHeight[4][201]; // 3 layers of heigts for snow positions and a 4th as a save of the standard original
-
+// bird variables
 GLfloat clickpos[2] = { 0,0 };
-bird birds[51];
-int activeBird[51];
+bird birds[50];
+int activeBird[50];
 int totalActiveBirds = 0;
-
+// fire / lightning variables
+flame fireEquation;
 float lightningPoints[5];
-float lightningSpawn = -1000;
+float lightningSpawn = -1000; // sets the lightning spawn value to a number less than -60 so that the lightning wont show at program load
 bool fire = true;
+
 /******************************************************************************
- * Entry Point (don't put anything except the main function here)
+ * Entry Point
  ******************************************************************************/
 
 void main(int argc, char** argv){
@@ -169,7 +162,7 @@ void main(int argc, char** argv){
 }
 
 /******************************************************************************
- * GLUT Callbacks (don't add any other functions here)
+ * GLUT Callbacks
  ******************************************************************************/
 
 void display(void){
@@ -177,7 +170,10 @@ void display(void){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glBegin(GL_QUAD_STRIP);
+	float circleCenter[4] = { 0.16863,0.117647,0.02353,1 }; // circle color variables used throught the display, loaded with the first color in
+	float circleOuter[4] = { 0.25098, 0.17255, 0.02353,1 };
+
+	glBegin(GL_QUAD_STRIP); // draws the ground
 		int num = 0;
 		for (float i = -1; i <= 1; i += 0.01) {
 			glColor4f(0.15294, 0.56863, 0.0667, 1);
@@ -187,9 +183,8 @@ void display(void){
 			num++;
 		}
 	glEnd();
-	float circleCenter[4] = { 0.16863,0.117647,0.02353,1 };
-	float circleOuter[4] = { 0.25098, 0.17255, 0.02353,1 };
-	circle(0.2, 0.53, lanscape[145], 0.53, lanscape[145], circleCenter, circleOuter, 0, 2 * M_PI, false);
+	
+	circle(0.2, 0.53, lanscape[145], 0.53, lanscape[145], circleCenter, circleOuter, 0, 2 * M_PI, false); // draws the fire pit chared grass
 
 
 	glBegin(GL_QUAD_STRIP); // sky to be invert of the ground
@@ -205,7 +200,7 @@ void display(void){
 
 
 
-	for (int i = 0; i < 5000; i++) {
+	for (int i = 0; i < 5000; i++) { // draws all snow in back 2 layers
 		if (snow[i].depth <= 1 && snow[i].active) {
 			glColor4f(1, 1, 1, snow[i].transparancy);
 			glPointSize(snow[i].size);
@@ -348,71 +343,72 @@ void display(void){
 		}
 	}
 
-
+	// fire wood, fire and fire pit code
 	circleCenter[0] = 0.6392; circleCenter[1] = 0.3412; circleCenter[2] = 0.0627; circleCenter[3] = 1;
 	circleOuter[0] = 0.388235; circleOuter[1] = 0.2; circleOuter[2] = 0.0235; circleOuter[3] = 1;
-	circle(0.05, 0.5, lanscape[145] + 0.78 - 0.785, 0.46, lanscape[145] + 0.78 - 0.765, circleCenter, circleOuter, 1.5 * M_PI, 1.815 * M_PI, false);
+	circle(0.05, 0.5, lanscape[145] + 0.78 - 0.785, 0.46, lanscape[145] + 0.78 - 0.765, circleCenter, circleOuter, 1.5 * M_PI, 1.815 * M_PI, false);  // bottom log and the cap
 	glBegin(GL_QUAD_STRIP);
 		glColor4f(0.388235, 0.2, 0.0235, 1);
-		glVertex2f(0.63, lanscape[145] + 0.78 - 0.825); //lanscape[145]+0.79
-		glVertex2f(0.45, lanscape[145] + 0.78 - 0.785); //lanscape[150]-0.09
+		glVertex2f(0.63, lanscape[145] - 0.045);
+		glVertex2f(0.45, lanscape[145] - 0.005); 
 		glColor4f(0.6392, 0.3412, 0.0627, 1);
-		glVertex2f(0.64, lanscape[145] + 0.78 - 0.80); //lanscape[150]-0.05
-		glVertex2f(0.46, lanscape[145] + 0.78 - 0.765);
+		glVertex2f(0.64, lanscape[145] - 0.02); 
+		glVertex2f(0.46, lanscape[145] + 0.015);
 		glColor4f(0.388235, 0.2, 0.0235, 1);
-		glVertex2f(0.65, lanscape[145] + 0.78 - 0.775);
-		glVertex2f(0.47, lanscape[145] + 0.78 - 0.745);
+		glVertex2f(0.65, lanscape[145] + 0.005);
+		glVertex2f(0.47, lanscape[145] + 0.036);
 	glEnd();
-	circle(0.023, 0.558, lanscape[145] + 0.78 - 0.716, 0.56, lanscape[145] + 0.78 - 0.705, circleCenter, circleOuter, 1.7 * M_PI, 2.45 * M_PI, false);
+	circle(0.023, 0.558, lanscape[145] + 0.78 - 0.716, 0.56, lanscape[145] + 0.78 - 0.705, circleCenter, circleOuter, 1.7 * M_PI, 2.45 * M_PI, false); // second log and the cap
 	glBegin(GL_QUAD_STRIP);
 		glColor4f(0.388235, 0.2, 0.0235, 1);
-		glVertex2f(0.43, lanscape[145] + 0.78 - 0.845);
-		glVertex2f(0.54, lanscape[145] + 0.78 - 0.7);
+		glVertex2f(0.43, lanscape[145] - 0.065);
+		glVertex2f(0.54, lanscape[145] + 0.08);
 		glColor4f(0.6392, 0.3412, 0.0627, 1);
-		glVertex2f(0.455, lanscape[145] + 0.78 - 0.8525);
-		glVertex2f(0.56, lanscape[145] + 0.78 - 0.705);
+		glVertex2f(0.455, lanscape[145] - 0.0725);
+		glVertex2f(0.56, lanscape[145] + 0.075);
 		glColor4f(0.388235, 0.2, 0.0235, 1);
-		glVertex2f(0.48, lanscape[145] + 0.78 - 0.86);
-		glVertex2f(0.58, lanscape[145] + 0.78 - 0.71);
+		glVertex2f(0.48, lanscape[145] - 0.08);
+		glVertex2f(0.58, lanscape[145] + 0.07);
 	glEnd();
-	circle(0.0235, 0.498, lanscape[145] + 0.78 - 0.713, 0.49, lanscape[145] + 0.78 - 0.7, circleCenter, circleOuter, 1.5 * M_PI, 2.1 * M_PI, false);
+	circle(0.0235, 0.498, lanscape[145] + 0.78 - 0.713, 0.49, lanscape[145] + 0.78 - 0.7, circleCenter, circleOuter, 1.5 * M_PI, 2.1 * M_PI, false); // third log and the cap
 	glBegin(GL_QUAD_STRIP);
 		glColor4f(0.388235, 0.2, 0.0235, 1);
-		glVertex2f(0.6, lanscape[145] + 0.78 - 0.87);
-		glVertex2f(0.475, lanscape[145] + 0.78 - 0.71);
+		glVertex2f(0.6, lanscape[145] - 0.09);
+		glVertex2f(0.475, lanscape[145] + 0.07);
 		glColor4f(0.6392, 0.3412, 0.0627, 1);
-		glVertex2f(0.6225, lanscape[145] + 0.78 - 0.86);
-		glVertex2f(0.49, lanscape[145] + 0.78 - 0.7);
+		glVertex2f(0.6225, lanscape[145] - 0.08);
+		glVertex2f(0.49, lanscape[145] + 0.08);
 		glColor4f(0.388235, 0.2, 0.0235, 1);
-		glVertex2f(0.645, lanscape[145] + 0.78 - 0.85);
-		glVertex2f(0.505, lanscape[145] + 0.78 - 0.69);
-	glEnd();
-
-	circle(0.0235, 0.522, lanscape[145] + 0.78 - 0.72, 0.5175, lanscape[145] + 0.78 - 0.705, circleCenter, circleOuter, 1.60 * M_PI, 2.2 * M_PI, false);
-	glBegin(GL_QUAD_STRIP);
-		glColor4f(0.388235, 0.2, 0.0235, 1);
-		glVertex2f(0.51, lanscape[145] + 0.78 - 0.89);
-		glVertex2f(0.50, lanscape[145] + 0.78 - 0.71);
-		glColor4f(0.6392, 0.3412, 0.0627, 1);
-		glVertex2f(0.535, lanscape[145] + 0.78 - 0.885);
-		glVertex2f(0.5175, lanscape[145] + 0.78 - 0.705);
-		glColor4f(0.388235, 0.2, 0.0235, 1);
-		glVertex2f(0.56, lanscape[145] + 0.78 - 0.88);
-		glVertex2f(0.535, lanscape[145] + 0.78 - 0.7);
+		glVertex2f(0.645, lanscape[145] - 0.07);
+		glVertex2f(0.505, lanscape[145] + 0.09);
 	glEnd();
 
-	if (fire == true && lightningSpawn + 15 < framesPassed) {
+	circle(0.0235, 0.522, lanscape[145] + 0.78 - 0.72, 0.5175, lanscape[145] + 0.78 - 0.705, circleCenter, circleOuter, 1.60 * M_PI, 2.2 * M_PI, false); // top log and the cap
+	glBegin(GL_QUAD_STRIP);
+		glColor4f(0.388235, 0.2, 0.0235, 1);
+		glVertex2f(0.51, lanscape[145] - 0.11);
+		glVertex2f(0.50, lanscape[145] + 0.07);
+		glColor4f(0.6392, 0.3412, 0.0627, 1);
+		glVertex2f(0.535, lanscape[145] - 0.105);
+		glVertex2f(0.5175, lanscape[145] + 0.075);
+		glColor4f(0.388235, 0.2, 0.0235, 1);
+		glVertex2f(0.56, lanscape[145] - 0.1);
+		glVertex2f(0.535, lanscape[145] + 0.08);
+	glEnd();
+
+	if (fire == true && lightningSpawn + 15 < framesPassed) { // draws fire if fire is active and lightning has landed
 		glBegin(GL_TRIANGLE_FAN);
 			glColor4f(1, 0, 0, 1);
-			glVertex2f(0.53 + 0.022 * sin(fireEquation.angle), lanscape[145] + 0.07 + 0.015 * cos(fireEquation.angle));
+			glVertex2f(0.53 + 0.022 * sin(fireEquation.angle), lanscape[145] + 0.07 + 0.015 * cos(fireEquation.angle)); // shifts the center of the fan with sway of the flame peak
 			glColor4f(1, 0.6196, 0, 0.8);
+			// draws each of the 4 segments of the flame (roughly 4 quarters)
 			for (float y = lanscape[145] - 0.08; y < fireEquation.y2; y += 0.001) { glVertex2f((float)(fireEquation.A * pow((y - fireEquation.y2), 2) + fireEquation.x2), y); }
 			for (float y = fireEquation.y2; y <= lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle); y += 0.001) { glVertex2f(fireEquation.B * pow((y - fireEquation.y2), 2) + fireEquation.x2, y); }
 			for (float y = lanscape[145] - 0.08; y < fireEquation.y3; y += 0.001) { glVertex2f(fireEquation.A2 * pow((y - fireEquation.y3), 2) + fireEquation.x3, y); }
 			for (float y = fireEquation.y3; y <= lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle); y += 0.001) { glVertex2f(fireEquation.B2 * pow((y - fireEquation.y3), 2) + fireEquation.x3, y); }
 		glEnd();
 	}
-
+	// stones suronding the fire pit
 	float stoneCenterColor[4] = { 0.77255, 0.77255, 0.77255,1 };
 	float stoneOuterColor[4] = { 0.67843, 0.65098, 0.62745,1 };
 	circle(0.02, 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1.5 * M_PI), 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1.5 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
@@ -420,16 +416,9 @@ void display(void){
 	circle(0.02, 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(0.5 * M_PI), 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(0.5 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
 	circle(0.02, 0.53 + 0.15 * sin(0.75 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(0.75 * M_PI), 0.53 + 0.15 * sin(0.75 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(0.75 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
 	circle(0.02, 0.53 + 0.15 * sin(1.25 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1.25 * M_PI), 0.53 + 0.15 * sin(1.25 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1.25 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
-
-
-	char text[] = "bird";
-	for (int i = 0; i < 4; i++) {
-		glRasterPos2f(-0.5, 0.8);
-
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, "h");
-	}
-
-	for (int i = 0; i < 50; i++) {
+	
+	// bird code
+	for (int i = 0; i < 50; i++) { // loops through every bird checking if they are active and drawing them if they are
 		if (activeBird[i] == 1) {
 			glLoadIdentity(); // gets fresh identity matrix
 			glPushMatrix();
@@ -439,84 +428,73 @@ void display(void){
 			float birdCenterColor[4] = { 0.2118, 0.1529, 0,1 };
 			float birdOuterColor[4] = { 0.2118, 0.1529, 0,1 };
 			glColor4f(0.2118, 0.1529, 0, 1);
-
-			glBegin(GL_POLYGON);
+			glBegin(GL_POLYGON); // center rectangle
 				glVertex2f(0.035355, 0.017678);
 				glVertex2f(-0.035355, 0.017678);
 				glVertex2f(-0.035355, -0.017678);
 				glVertex2f(0.035355, -0.017678);
 			glEnd();
-
-			glBegin(GL_POLYGON);
+			glBegin(GL_POLYGON); // rectangle for bottom of wing
 				glVertex2f(0.008445, 0.035606602);
 				glVertex2f(-0.030445, 0.035606602);
 				glVertex2f(-0.030445, 0.014393398);
 				glVertex2f(0.008445, 0.014393398);
 			glEnd();
-
-			glBegin(GL_TRIANGLES);
+			glBegin(GL_TRIANGLES); // triangl on the botom right of wing
 				glVertex2f(0.005, 0.045);
 				glVertex2f(0.005, 0.015);
 				glVertex2f(0.02, 0.015);
 			glEnd();
-
-			glBegin(GL_TRIANGLES);
+			glBegin(GL_TRIANGLES); // triangle on the top right of the wing
 				glVertex2f(-0.035, 0.03);
 				glVertex2f(0.01, 0.03);
 				glVertex2f(0.01, 0.063);
 			glEnd();
-
-			glBegin(GL_POLYGON);
+			glBegin(GL_POLYGON); // rectangle behind beak
 				glVertex2f(0.035, 0.01);
 				glVertex2f(0.06, 0.01);
 				glVertex2f(0.06, 0.02);
 				glVertex2f(0.035, 0.02);
 			glEnd();
-
-			glBegin(GL_POLYGON);
+			glBegin(GL_POLYGON); // rectangle at botom of 2 tail feathers
 				glVertex2f(-0.05, 0.0025);
 				glVertex2f(-0.0625, 0.0025);
 				glVertex2f(-0.0625, 0.015);
 				glVertex2f(0.05, 0.015);
 			glEnd();
-
-			glBegin(GL_POLYGON);
+			glBegin(GL_POLYGON); // rectangle at top of 2 tail feathers
 				glVertex2f(-0.05, 0.02);
 				glVertex2f(-0.06, 0.02);
 				glVertex2f(-0.06, 0.015);
 				glVertex2f(0.05, 0.015);
 			glEnd();
-
-			glBegin(GL_TRIANGLES);
+			glBegin(GL_TRIANGLES); // triangle at top of tail faether
 				glVertex2f(-0.045, 0.02);
 				glVertex2f(-0.065, 0.0175);
 				glVertex2f(-0.065, 0.0275);
 			glEnd();
-
-
 			glColor4f(0, 0, 0, 1);
-			glBegin(GL_TRIANGLES);
+			glBegin(GL_TRIANGLES); // beak
 				glVertex2f(0.06, 0.01);
 				glVertex2f(0.06, 0.02);
 				glVertex2f(0.07, 0.012);
 			glEnd();
-
 			glColor4f(0.2118, 0.1529, 0, 1);
-			circle(0.005, -0.0625, 0.007375, -0.0625, 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
-			circle(0.00375, -0.065, 0.02375, -0.065, 0.02375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
-			circle(0.0275, -0.005, 0.035 , 0.005, 0.03, birdCenterColor, birdOuterColor, 1.25 * M_PI, 2.15 * M_PI, false);
-			circle(0.03, -0.035, 0.05, -0.05, 0.01, birdCenterColor, birdOuterColor, 1 * M_PI, 1.17 * M_PI, false);
-			circle(0.3, 0.015, 0.277, 0.015, -0.015, birdCenterColor, birdOuterColor, 1 * M_PI, 1.055 * M_PI, false);
-			circle(0.052, 0, 0.022, -0.03, 0.018, birdCenterColor, birdOuterColor, 1.2 * M_PI, 1.46 * M_PI, false);
-			circle(0.02, 0.04, 0.018, 0.04, 0.015, birdCenterColor, birdOuterColor, 1.45 * M_PI, 2.55 * M_PI, false);
-			circle(0.055, 0.085, -0.04, 0.035, 0.01, birdCenterColor, birdOuterColor, 1.625 * M_PI, 1.9 * M_PI, false);
-			circle(0.02, 0.015, -0.003, 0.015, -0.015, birdCenterColor, birdOuterColor, M_PI *3 / 4, 1 * M_PI, false);
+			circle(0.005, -0.0625, 0.007375, -0.0625, 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false); // circle on the end of the bottom tail feather
+			circle(0.00375, -0.065, 0.02375, -0.065, 0.02375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false); // circle on the end on the top tail feather
+			circle(0.0275, -0.005, 0.035 , 0.005, 0.03, birdCenterColor, birdOuterColor, 1.25 * M_PI, 2.15 * M_PI, false); // top of wing
+			circle(0.3, 0.015, 0.277, 0.015, -0.015, birdCenterColor, birdOuterColor, 1 * M_PI, 1.055 * M_PI, false); // curve at bottom of bird
+			circle(0.052, 0, 0.022, -0.03, 0.018, birdCenterColor, birdOuterColor, 1.2 * M_PI, 1.46 * M_PI, false); // main curve at back of bird
+			circle(0.02, 0.04, 0.018, 0.04, 0.015, birdCenterColor, birdOuterColor, 1.45 * M_PI, 2.55 * M_PI, false); // top of head
+			circle(0.055, 0.085, -0.04, 0.035, 0.01, birdCenterColor, birdOuterColor, 1.625 * M_PI, 1.9 * M_PI, false); // botom of head curve
+			circle(0.02, 0.015, -0.003, 0.015, -0.015, birdCenterColor, birdOuterColor, M_PI *3 / 4, 1 * M_PI, false); // bottom right corner curve
 			float eyeColour[4] = { 1,1,1,1 };
-			circle(0.004, 0.045, 0.025, 0.045, 0.025, eyeColour, eyeColour, 0 * M_PI, 2 * M_PI, false);
+			circle(0.004, 0.045, 0.025, 0.045, 0.025, eyeColour, eyeColour, 0 * M_PI, 2 * M_PI, false); // eye
 
-			glPopMatrix();
+			glPopMatrix(); // makes transformation not aply to anything after this point
 		}
 	}
+	// display diagnostics code
 	glColor4f(0, 0, 0, 1);
 	printText("Number of Snow Particles:", -0.95, 0.85); // prints the snow amount
 	for (int i = 0; i < 4; i++) {
@@ -541,10 +519,11 @@ void display(void){
 	printText("Press f to toggle fire", -0.95, 0.65);// prints the comands
 	printText("Click to summon bird", -0.95, 0.6);// prints the comands
 	glColor4f(0.95, 0.95, 0.95, 1);
-	if (fire == true) {
+	// lightning code
+	if (fire == true) { 
 		// after testing line strip didnt work with varying thicknesses, so instead I am using multiple lines each different thicknesses
-		if (lightningSpawn + 2 > framesPassed) {
-			glLineWidth(7);
+		if (lightningSpawn + 2 > framesPassed) { // display portion of lightning depending on frames passed since pressing f
+			glLineWidth(7); // changes width of each section of the lightining bolt to give more realistic effect
 			glBegin(GL_LINES);
 				glVertex2f(lightningPoints[0], 1);
 				glVertex2f(lightningPoints[1], 0.55);
@@ -641,45 +620,6 @@ void display(void){
 	glutSwapBuffers();
 }
 
-void printText(char text[], float x, float y) {
-	//prints passed in text 1 charicter at a time at specified locations
-	for (int i = 0; i < strlen(text); i++) {
-		glRasterPos2f(x + 0.0225 * i, y);
-		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, text[i]);
-	}
-}
-
-void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[4], float outerColor[4], float startPoint, float endPoint, bool background) {
-	// function to do all circles and arcs
-	glBegin(GL_TRIANGLE_FAN);
-	glColor4f(centerColor[0], centerColor[1], centerColor[2], centerColor[3]); // color of center vertex
-	glVertex2f(centerX, centerY);
-	glColor4f(outerColor[0], outerColor[1], outerColor[2], outerColor[3]);
-	if (background == false) { // checkes if it is suposed to effect snow landing positions
-		for (float i = startPoint; i <= endPoint; i += 0.01) {
-			glVertex2f(x + radius * sin(i), y + radius * cos(i));
-		}
-	}
-	else {
-		for (float i = startPoint; i <= endPoint; i += 0.01) {
-			glVertex2f(x + radius * sin(i), y + radius * cos(i));
-			alterLanscape(x + radius * sin(i), y + radius * cos(i)); // makes the circle effect snow landing positions
-		}
-	}
-	glEnd();
-}
-void alterLanscape(float x, float y) {
-	// changes the height of the snow landing positions based on the geometry of added shaped
-	int heightIndex = round((x + 1) * 100);
-	if (snowHeight[1][heightIndex] < y) {
-		snowHeight[1][heightIndex] = y - 0.003; // alows things to be landed ontop of
-	}
-	if (snowHeight[2][heightIndex] > y) {
-		snowHeight[2][heightIndex] = y - 0.003; // makes the snof fall infront and behind the object at the same height as the object base rather than the original lanscape height
-		snowHeight[3][heightIndex] = y - 0.003;
-	}
-}
-
 /*
 	Called when the OpenGL window has been resized.
 */
@@ -697,45 +637,6 @@ void mouse(int button, int state, int x, int y) {
 		clickpos[1] = ((GLfloat)y / (GLfloat)FramePixels) * -2 + 1;
 		birdfunc();
 	}
-}
-void birdfunc(void) {
-	// generates 2 random rumbers relative to the click position and makes those quordinates, and creates 2 quadratics creating a flightpath based on those 3 points, also intiitalises all other values of birds
-	float p1y = (((float)rand() / RAND_MAX) * 0.5f);
-	p1y = p1y * (clickpos[0] + 1);
-	if (rand() % 2 == 1) { p1y = -p1y; }// 50% chance that it is negative
-	p1y += clickpos[1]; // makes it a y position relative to the click y
-	float p2y = (((float)rand() / RAND_MAX) * 0.5f);
-	p2y = p2y * ((clickpos[0] - 1) * -1);
-	if (rand() % 2 == 1) { p2y = -p2y; }
-	p2y += clickpos[1]; // makes it a y position relative to the click y
-	for (int i = 0; i < 50; i++) { // loops though all posible bird instance and initialses values to the first non active one
-		if (activeBird[i] == 0) {
-			totalActiveBirds++;
-			activeBird[i] = 1;
-			birds[i].formula.X2 = clickpos[0];
-			birds[i].formula.Y2 = clickpos[1];
-			birds[i].formula.A = (p1y - birds[i].formula.Y2) / pow((-1 - birds[i].formula.X2), 2);
-			birds[i].formula.B = (p2y - birds[i].formula.Y2) / pow((1 - birds[i].formula.X2), 2);
-			birds[i].location.x = -1.1;
-			birds[i].location.y = p1y; // setting initial location of bird to the random point
-			birds[i].dx = ((((float)rand() / RAND_MAX) * 0.02f) + 0.0055f); // random speed of bird
-			birds[i].theta = 0;
-			break;
-		}
-	}
-}
-
-void lightning() {
-	// generates 3 random points pluss the fixed point of the lightning parth
-	lightningSpawn = framesPassed;
-	lightningPoints[4] = 0.53;
-	int multiplyer = 1;
-	if (rand() % 2 == 1) { multiplyer = -1; }
-	for (int i = 3; i >= 0; i--) {
-		lightningPoints[i] = ((((float)rand() / RAND_MAX) * 0.25f) + 0.1f) * (pow(-1, i) * multiplyer) + lightningPoints[i + 1]; // makes it so that each point is alternating directions from the previous
-	}
-
-
 }
 
 void keyPressed(unsigned char key, int x, int y){
@@ -782,15 +683,6 @@ void idle(void){
 	glutPostRedisplay(); // Tell OpenGL there's a new frame ready to be drawn.
 }
 
-void calculateFlame( float y2, float y3) {
-	// calculates the current 4 equations values based on the current y values and angle of peak
-	fireEquation.y2 = y2;
-	fireEquation.A = (0.53 - fireEquation.x2) / pow((lanscape[145] - 0.08 - fireEquation.y2), 2); // A,b,A2,B2 all change the rate of curviture of their respective functions (all of them are for different curves)
-	fireEquation.B = (0.53 + 0.035 * sin(fireEquation.angle) + 0.003 - fireEquation.x2) / pow((lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle) - fireEquation.y2), 2); // fireEquation.angle is to do with changing peak position
-	fireEquation.y3 = y3;
-	fireEquation.A2 = (0.53 - fireEquation.x3) / pow((lanscape[145] - 0.08 - fireEquation.y3), 2);
-	fireEquation.B2 = (0.53 + 0.035 * sin(fireEquation.angle) - 0.003 - fireEquation.x3) / pow((lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle) - fireEquation.y3), 2);
-}
 /******************************************************************************
  * Animation-Specific Functions (Add your own functions at the end of this section)
  ******************************************************************************/
@@ -845,11 +737,13 @@ void init(void){
 }
 
 void think(void){
+	// code that runs every frame to update all animation based changes execpt for 1 off user inputs (e.g. not bird initialisation)
 	framesPassed++;
+	// 
 	if (snowfall) {
-		if (totalSnow != 5000) {
+		if (totalSnow != 5000) { // checks to make sure all snow isnt active to save time
 			for (int i = 0; i < 5000; i++) {
-				if (snow[i].active == false) {
+				if (snow[i].active == false) { // if true makes the snow viabale, adds to total snow and gets it moving
 					totalSnow++;
 					snow[i].active = true;
 					snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
@@ -858,27 +752,27 @@ void think(void){
 			}
 		}
 	}
-	for (int i = 0; i < 5000; i++) {
+	// loops through all active snow and makes the relevant changes
+	for (int i = 0; i < 5000; i++) { 
 		if (snow[i].active) {
-			snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC;
-			int heightIndex = round((snow[i].location.x + 1) * 100);
-			if (heightIndex > 199) { heightIndex = 199; } // stops error where they round to the next one and go lower than the lanscape
-			if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[snow[i].depth][heightIndex] && snow[i].landTime == 0) {
+			snow[i].location.y -= snow[i].dy * FRAME_TIME_SEC; // moves the snow down by the apropriate amount (dy will be 0 if it isnt suposed to move)
+			int heightIndex = round((snow[i].location.x + 1) * 100); // gets the coresponding index value of snow height for the relevant x position of this snow particle
+			if (snow[i].location.y - (snow[i].size / FramePixels) <= snowHeight[snow[i].depth][heightIndex] && snow[i].landTime == 0) { // checks if snow is less than or = to the the current snow height
 				snow[i].location.y = snowHeight[snow[i].depth][heightIndex] + (snow[i].size / FramePixels);
 				snow[i].landTime = framesPassed;
 				snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
 				snow[i].dy = 0;
-				if (fire == true && lightningSpawn + 6 < framesPassed) {
-					if (snow[i].location.x >= 0.33 && snow[i].location.x <= 0.73) {
+				if (fire == true && lightningSpawn + 6 < framesPassed) { // checks if fire state, and lighting has hit yet (hence the 6 frame delay)
+					if (snow[i].location.x >= 0.33 && snow[i].location.x <= 0.73) { // in the fire pit
 						snow[i].lifetime = 0;
 					}
-					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) {
+					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) { // scales the lifetime based on distance away from the fire
 						snow[i].lifetime = (rand() % 3500 + 2000) * (snow[i].location.x - 0.38) * -1.5;
 					}
-					else if (snow[i].location.x >= 0.73) {
+					else if (snow[i].location.x >= 0.73) { // scales the lifetime based on distance away from the fire
 						snow[i].lifetime = (rand() % 3500 + 2000) * ((snow[i].location.x - 0.68) * 1.5);
 					}
-					else {
+					else { // far enough away from fire to use regular equation
 						snow[i].lifetime = rand() % 3500 + 2000;
 					}
 				}
@@ -888,14 +782,16 @@ void think(void){
 				continue;
 			}
 			else if (snow[i].dy == 0 && (snow[i].location.y) > snowHeight[snow[i].depth][heightIndex]) {
+				printf("dy=0 condition");
 				snow[i].location.y = snowHeight[snow[i].depth][heightIndex];
 			}
-			if (framesPassed > snow[i].landTime + snow[i].lifetime && snow[i].landTime != 0) {
-				for (int x = 0; x < 5000; x++) {
+			if (framesPassed > snow[i].landTime + snow[i].lifetime && snow[i].landTime != 0) { // checks if it is time to recycle
+				for (int x = 0; x < 5000; x++) { // loops through all other snow and moves them down if on same x and depth, landed and above this snow
 					if ((round((snow[x].location.x + 1) * 100) == round((snow[i].location.x + 1) * 100) && snow[x].landTime != 0) && snow[x].location.y > snow[i].location.y && snow[x].depth == snow[i].depth) {
 						snow[x].location.y -= snow[i].size / FramePixels;
 					}
 				}
+				// redefines snows values to be recycled
 				snowHeight[snow[i].depth][heightIndex] -= snow[i].size / FramePixels;
 				snow[i].landTime = 0;
 				snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
@@ -903,18 +799,18 @@ void think(void){
 				snow[i].size = (((float)rand() / RAND_MAX) * 7.0f) + 1.5f;
 				snow[i].transparancy = ((((float)rand() / RAND_MAX) * 0.2f) + 0.6f);
 				snow[i].depth = rand() % 3; //sets layer to random 0,1 or 2
-				if (snowfall == true && true != (fire == true && lightningSpawn + 7 == framesPassed)) {
+				if (snowfall == true && true != (fire == true && lightningSpawn + 7 == framesPassed)) { // checks if lightning just hapened and makes all inactive, so that you dont get a large influx of snow at the top
 					snow[i].dy = ((((float)rand() / RAND_MAX) * 0.005f) + 0.01f) * snow[i].size;
 				}
-				else {
+				else { // makes inactive and will eventualy reactivate (code at top of think)
 					snow[i].active = false;
 					snow[i].dy = 0;
 					totalSnow--;
 				}
 			}
-			if (fire == true && lightningSpawn + 6 == framesPassed) {
+			if (fire == true && lightningSpawn + 6 == framesPassed) { // if lightning has just struck
 				if (snow[i].landTime != 0) {
-					if (snow[i].location.x >= 0.33 && snow[i].location.x <= 0.73) {
+					if (snow[i].location.x >= 0.33 && snow[i].location.x <= 0.73) { // removes all snow in the pit ready to be reactivated
 						snow[i].lifetime = 0;
 						snow[i].location.x = (((float)rand() / RAND_MAX) * 2.0f) - 1.0f;
 						snow[i].location.y = 1.05f;
@@ -925,21 +821,18 @@ void think(void){
 						snow[i].dy = 0;
 						totalSnow--;
 					}
-					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.38) * -1.5)); }
-					else if (snow[i].location.x >= 0.73) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.68) * 1.5)); }
-					if (framesPassed > snow[i].landTime + snow[i].lifetime) {
-
-					}
+					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.38) * -1.5)); } // reduces the reamining lifetime of all snow surounding pit (if = 0 it will get picked up above where it says framepass ==7 and deactivate them)
+					else if (snow[i].location.x >= 0.73) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.68) * 1.5)); } // same as above but on other side of pit
 				}
-				for (int x = 133; x <= 173; x++) {
-					snowHeight[0][x] = lanscape[x] - 0.003;
-					snowHeight[1][x] = lanscape[x] - 0.003;
-					snowHeight[2][x] = lanscape[x] - 0.003;
+				for (int x = 133; x <= 173; x++) { // resets snow height to original height in fire pit
+					snowHeight[0][x] = snowHeight[3][x];
+					snowHeight[1][x] = snowHeight[3][x];
+					snowHeight[2][x] = snowHeight[3][x];
 
 				}
 
 			}
-			if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[3][heightIndex]) {
+			if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[3][heightIndex]) { // checks to make sure that snow hasnt gone slightly to far, and pushes it back up to lanscape;
 				snow[i].location.y = snowHeight[3][heightIndex] + (snow[i].size / FramePixels);
 				snow[i].location.y = snowHeight[snow[i].depth][heightIndex] + (snow[i].size / FramePixels);
 				snow[i].landTime = framesPassed;
@@ -959,30 +852,31 @@ void think(void){
 						snow[i].lifetime = rand() % 3500 + 2000;
 					}
 				}
-				if (snowHeight[snow[i].depth][heightIndex] < snow[i].location.y) { snowHeight[snow[i].depth][heightIndex] += snow[i].location.y; }
+				if (snowHeight[snow[i].depth][heightIndex] < snow[i].location.y) { snowHeight[snow[i].depth][heightIndex] += snow[i].location.y; } // checks to make sure that snowheight isnt to low
 			}
 
 		}
 	}
-
-	for (int i = 0; i < 80; i++) {
+	// loops through all birds and moves it by dx and calculates dy and gradient
+	for (int i = 0; i < 50; i++) { 
 		if (activeBird[i] == 1) {
 			birds[i].location.x += birds[i].dx;
 			float gradient;
 			if (birds[i].location.x > 1.1) { activeBird[i] = 0; totalActiveBirds--; continue; }
 			if (birds[i].location.x <= birds[i].formula.X2) {
 				birds[i].location.y = birds[i].formula.A * pow((birds[i].location.x - birds[i].formula.X2), 2) + birds[i].formula.Y2;
-				gradient = 2 * birds[i].formula.A * (birds[i].location.x - birds[i].formula.X2);
+				gradient = 2 * birds[i].formula.A * (birds[i].location.x - birds[i].formula.X2); // calculates gradient from derivative of the general formula y=A(x-X2)^2 +Y2 ( y=2a(x-X2) )
 			}
 			else {
 				birds[i].location.y = birds[i].formula.B * pow((birds[i].location.x - birds[i].formula.X2), 2) + birds[i].formula.Y2;
-				gradient = 2 * birds[i].formula.B * (birds[i].location.x - birds[i].formula.X2);
+				gradient = 2 * birds[i].formula.B * (birds[i].location.x - birds[i].formula.X2); // calculates gradient from derivative of the general formula y=B(x-x2)^2 +Y2 ( y=2B(x-X2) )
 			}
-			birds[i].theta = atan(gradient) * 180 / M_PI;
+			birds[i].theta = atan(gradient) * 180 / M_PI; // calculates the angle for bird to be rotated from gradient
 			if (i != 0) {
 			}
 		}
 	}
+	// changes the angle of the fire peak circle by 0.06 radians per frame and sways the frame sides up and down
 	fireEquation.angle += 0.06;
 	if (fireEquation.state == 0) {
 		if (fireEquation.y2 < lanscape[145] + 0.09) {
@@ -996,4 +890,94 @@ void think(void){
 		}
 		else { fireEquation.state = 0; }
 	}
+}
+
+
+void printText(char text[], float x, float y) {
+	//prints passed in text 1 charicter at a time at specified locations
+	for (int i = 0; i < strlen(text); i++) {
+		glRasterPos2f(x + 0.0225 * i, y);
+		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, text[i]);
+	}
+}
+
+void circle(float radius, float x, float y, float centerX, float centerY, float centerColor[4], float outerColor[4], float startPoint, float endPoint, bool background) {
+	// function to do all circles and arcs
+	glBegin(GL_TRIANGLE_FAN);
+	glColor4f(centerColor[0], centerColor[1], centerColor[2], centerColor[3]); // color of center vertex
+	glVertex2f(centerX, centerY);
+	glColor4f(outerColor[0], outerColor[1], outerColor[2], outerColor[3]);
+	if (background == false) { // checkes if it is suposed to effect snow landing positions
+		for (float i = startPoint; i <= endPoint; i += 0.01) {
+			glVertex2f(x + radius * sin(i), y + radius * cos(i));
+		}
+	}
+	else {
+		for (float i = startPoint; i <= endPoint; i += 0.01) {
+			glVertex2f(x + radius * sin(i), y + radius * cos(i));
+			alterLanscape(x + radius * sin(i), y + radius * cos(i)); // makes the circle effect snow landing positions
+		}
+	}
+	glEnd();
+}
+void alterLanscape(float x, float y) {
+	// changes the height of the snow landing positions based on the geometry of added shaped
+	int heightIndex = round((x + 1) * 100);
+	if (snowHeight[1][heightIndex] < y) {
+		snowHeight[1][heightIndex] = y - 0.003; // alows things to be landed ontop of
+	}
+	if (snowHeight[2][heightIndex] > y) {
+		snowHeight[2][heightIndex] = y - 0.003; // makes the snof fall infront and behind the object at the same height as the object base rather than the original lanscape height
+		snowHeight[3][heightIndex] = y - 0.003;
+	}
+}
+
+void birdfunc(void) {
+	// generates 2 random rumbers relative to the click position and makes those quordinates, and creates 2 quadratics creating a flightpath based on those 3 points, also intiitalises all other values of birds
+	float p1y = (((float)rand() / RAND_MAX) * 0.5f);
+	p1y = p1y * (clickpos[0] + 1);
+	if (rand() % 2 == 1) { p1y = -p1y; }// 50% chance that it is negative
+	p1y += clickpos[1]; // makes it a y position relative to the click y
+	float p2y = (((float)rand() / RAND_MAX) * 0.5f);
+	p2y = p2y * ((clickpos[0] - 1) * -1);
+	if (rand() % 2 == 1) { p2y = -p2y; }
+	p2y += clickpos[1]; // makes it a y position relative to the click y
+	for (int i = 0; i < 50; i++) { // loops though all posible bird instance and initialses values to the first non active one
+		if (activeBird[i] == 0) {
+			totalActiveBirds++;
+			activeBird[i] = 1;
+			birds[i].formula.X2 = clickpos[0];
+			birds[i].formula.Y2 = clickpos[1];
+			birds[i].formula.A = (p1y - birds[i].formula.Y2) / pow((-1 - birds[i].formula.X2), 2);
+			birds[i].formula.B = (p2y - birds[i].formula.Y2) / pow((1 - birds[i].formula.X2), 2);
+			birds[i].location.x = -1.1;
+			birds[i].location.y = p1y; // setting initial location of bird to the random point
+			birds[i].dx = ((((float)rand() / RAND_MAX) * 0.02f) + 0.0055f); // random speed of bird
+			birds[i].theta = 0;
+			break;
+		}
+	}
+}
+
+void lightning() {
+	// generates 3 random points pluss the fixed point of the lightning parth
+	lightningSpawn = framesPassed;
+	lightningPoints[4] = 0.53;
+	int multiplyer = 1;
+	if (rand() % 2 == 1) { multiplyer = -1; }
+	for (int i = 3; i >= 0; i--) {
+		lightningPoints[i] = ((((float)rand() / RAND_MAX) * 0.25f) + 0.1f) * (pow(-1, i) * multiplyer) + lightningPoints[i + 1]; // makes it so that each point is alternating directions from the previous
+	}
+
+
+}
+
+void calculateFlame(float y2, float y3) {
+	// calculates the current 4 equations values based on the current y values and angle of peak
+	fireEquation.y2 = y2;
+	fireEquation.A = (0.53 - fireEquation.x2) / pow((lanscape[145] - 0.08 - fireEquation.y2), 2); // A,b,A2,B2 all change the rate of curviture of their respective functions (all of them are for different curves)
+	fireEquation.B = (0.53 + 0.035 * sin(fireEquation.angle) + 0.003 - fireEquation.x2) / pow((lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle) - fireEquation.y2), 2); // fireEquation.angle is to do with changing peak position
+	fireEquation.y3 = y3;
+	fireEquation.A2 = (0.53 - fireEquation.x3) / pow((lanscape[145] - 0.08 - fireEquation.y3), 2);
+	fireEquation.B2 = (0.53 + 0.035 * sin(fireEquation.angle) - 0.003 - fireEquation.x3) / pow((lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle) - fireEquation.y3), 2);
 }
