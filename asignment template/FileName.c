@@ -105,15 +105,15 @@ typedef struct {
 }bird;
 
 typedef struct {
-	float x2 ;
+	float x2;
 	float y2;
 	float A;
-	float B ;
+	float B;
 	float x3;
 	float y3;
 	float A2;
 	float B2;
-	
+
 }flame;
 flame fireEquation[2];
 int fireOrder[2];
@@ -203,7 +203,7 @@ void display(void)
 
 
 	glBegin(GL_QUAD_STRIP); // sky to be invert of the ground
-	
+
 	num = 0;
 	for (float i = -1; i <= 1; i += 0.0101) {
 		glColor4f(0.557, 0.808, 1, 0.9);
@@ -217,7 +217,7 @@ void display(void)
 	if (framesPassed == 1) { firstPass = true; }
 	else { firstPass = false; }
 
-	
+
 	for (int i = 0; i < 5000; i++) {
 		if (snow[i].depth <= 1 && snow[i].active) {
 			glColor4f(1, 1, 1, snow[i].transparancy);
@@ -231,8 +231,8 @@ void display(void)
 	glLineWidth(4);
 	glColor4f(0.388235, 0.2, 0.0235, 1);
 	glBegin(GL_LINES);
-	glVertex2f(-0.61 , lanscape[50] + 0.345);
-	glVertex2f(-0.7 , lanscape[50] + 0.235);
+	glVertex2f(-0.61, lanscape[50] + 0.345);
+	glVertex2f(-0.7, lanscape[50] + 0.235);
 	glEnd();
 	glBegin(GL_LINES);
 	glVertex2f(-0.39, lanscape[50] + 0.345);
@@ -247,29 +247,29 @@ void display(void)
 	glColor4f(0.388235, 0.2, 0.0235, 1);
 	// the rest of the stick arms, drawn on top of the 3 balls
 	glBegin(GL_LINES);
-		glVertex2f(-0.7, lanscape[50] + 0.235);
-		glVertex2f(-0.5 + 0.15*sin(290 *M_PI / 180), lanscape[50] + 0.1 + 0.15*cos(290 * M_PI / 180));
+	glVertex2f(-0.7, lanscape[50] + 0.235);
+	glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
 	glEnd();
 	glBegin(GL_LINES);
-		glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
-		glVertex2f(-0.64, lanscape[50] + 0.08);
+	glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
+	glVertex2f(-0.64, lanscape[50] + 0.08);
 	glEnd();
 	glBegin(GL_LINES);
-		glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
-		glVertex2f(-0.6, lanscape[50] + 0.1);
+	glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
+	glVertex2f(-0.6, lanscape[50] + 0.1);
 	glEnd();
 	glBegin(GL_LINES);
-		glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
-		glVertex2f(-0.6, lanscape[50] + 0.16);
+	glVertex2f(-0.5 + 0.15 * sin(290 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(290 * M_PI / 180));
+	glVertex2f(-0.6, lanscape[50] + 0.16);
 	glEnd();
 
 	glBegin(GL_LINES);
-		glVertex2f(-0.3, lanscape[50] + 0.235);
-		glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
+	glVertex2f(-0.3, lanscape[50] + 0.235);
+	glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
 	glEnd();
 	glBegin(GL_LINES);
-		glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
-		glVertex2f(-0.36, lanscape[50] + 0.08);
+	glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
+	glVertex2f(-0.36, lanscape[50] + 0.08);
 	glEnd();
 	glBegin(GL_LINES);
 	glVertex2f(-0.5 + 0.15 * sin(75 * M_PI / 180), lanscape[50] + 0.1 + 0.15 * cos(75 * M_PI / 180));
@@ -299,23 +299,23 @@ void display(void)
 	snowmanCenterColor[0] = 0.92157; snowmanCenterColor[1] = 0.53725; snowmanCenterColor[2] = 0.129412;
 	circle(0.01, -0.5, lanscape[50] + 0.5225, -0.5, lanscape[50] + 0.5225, snowmanCenterColor, snowmanCenterColor, 1 * M_PI, 2 * M_PI, firstPass);
 	glBegin(GL_POLYGON);
-		glVertex2f(-0.5, lanscape[50] + 0.51);
-		glVertex2f(-0.5, lanscape[50] + 0.535);
-		glVertex2f(-0.47, lanscape[50] + 0.545);
+	glVertex2f(-0.5, lanscape[50] + 0.51);
+	glVertex2f(-0.5, lanscape[50] + 0.535);
+	glVertex2f(-0.47, lanscape[50] + 0.545);
 	glEnd();
 	// scarf alternating red and white
-	float scarfColor[4] = {1,0,0,1};
-	glLineWidth(1.5); 
+	float scarfColor[4] = { 1,0,0,1 };
+	glLineWidth(1.5);
 	for (float i = 0.355; i < 0.41; i += 0.008) {
 		if (scarfColor[1] == 0) { scarfColor[1] = 1; scarfColor[2] = 1; }
 		else { scarfColor[1] = 0; scarfColor[2] = 0; }
 		glColor4f(scarfColor[0], scarfColor[1], scarfColor[2], scarfColor[3]);
 
-		glBegin(GL_LINES); 
-		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.195 + i * cos(1.6 * M_PI)); 
-		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.15 + i * cos(1.6 * M_PI)); 
+		glBegin(GL_LINES);
+		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.195 + i * cos(1.6 * M_PI));
+		glVertex2f(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.15 + i * cos(1.6 * M_PI));
 		alterLanscape(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.195 + i * cos(1.6 * M_PI));
-		glEnd(); 
+		glEnd();
 	}
 
 	glBegin(GL_QUAD_STRIP);
@@ -330,21 +330,21 @@ void display(void)
 		alterLanscape(-0.285 + 0.41 * sin(i), lanscape[50] + 0.185 + 0.41 * cos(i));
 	}
 	glEnd();
-	
+
 	glBegin(GL_QUAD_STRIP);
-	for (float i = 0.8*M_PI; i <= 1.2*M_PI; i += 0.01) {
+	for (float i = 0.8 * M_PI; i <= 1.2 * M_PI; i += 0.01) {
 		if ((int)(i * 100) % 10 == 0) {
-			if (scarfColor[1] == 0) {scarfColor[1] = 1; scarfColor[2] = 1;}
+			if (scarfColor[1] == 0) { scarfColor[1] = 1; scarfColor[2] = 1; }
 			else { scarfColor[1] = 0; scarfColor[2] = 0; }
 		}
 		glColor4f(scarfColor[0], scarfColor[1], scarfColor[2], scarfColor[3]);
 		glVertex2f(-0.5 + 0.115 * sin(i), lanscape[50] + 0.585 + 0.115 * cos(i));
 		glVertex2f(-0.5 + 0.17 * sin(i), lanscape[50] + 0.585 + 0.17 * cos(i));
-	
+
 	}
 	glEnd();
 
-	
+
 	// makes snow of depth level 2 render infront of objects
 	for (int i = 0; i < 5000; i++) {
 		if (snow[i].depth == 2 && snow[i].active) {
@@ -360,41 +360,41 @@ void display(void)
 
 	float logCenterColor[4] = { 0.6392, 0.3412, 0.0627,1 };
 	float logOuterColor[4] = { 0.388235, 0.2, 0.0235,1 };
-	circle(0.05, 0.5, lanscape[145] + 0.78 -0.785, 0.46, lanscape[145] + 0.78 -0.765, logCenterColor, logOuterColor, 1.5 * M_PI, 1.815 * M_PI, false);
+	circle(0.05, 0.5, lanscape[145] + 0.78 - 0.785, 0.46, lanscape[145] + 0.78 - 0.765, logCenterColor, logOuterColor, 1.5 * M_PI, 1.815 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
-		glColor4f(0.388235, 0.2, 0.0235,1);
-		glVertex2f(0.63, lanscape[145] + 0.78 -0.825); //lanscape[145]+0.79
-		glVertex2f(0.45, lanscape[145] + 0.78 -0.785); //lanscape[150]-0.09
-		glColor4f(0.6392, 0.3412, 0.0627,1);
-		glVertex2f(0.64, lanscape[145] + 0.78 -0.80); //lanscape[150]-0.05
-		glVertex2f(0.46, lanscape[145] + 0.78 -0.765);
-		glColor4f(0.388235, 0.2, 0.0235,1);
-		glVertex2f(0.65, lanscape[145] + 0.78 -0.775);
-		glVertex2f(0.47, lanscape[145] + 0.78 -0.745);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	glVertex2f(0.63, lanscape[145] + 0.78 - 0.825); //lanscape[145]+0.79
+	glVertex2f(0.45, lanscape[145] + 0.78 - 0.785); //lanscape[150]-0.09
+	glColor4f(0.6392, 0.3412, 0.0627, 1);
+	glVertex2f(0.64, lanscape[145] + 0.78 - 0.80); //lanscape[150]-0.05
+	glVertex2f(0.46, lanscape[145] + 0.78 - 0.765);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	glVertex2f(0.65, lanscape[145] + 0.78 - 0.775);
+	glVertex2f(0.47, lanscape[145] + 0.78 - 0.745);
 	glEnd();
-	circle(0.023, 0.558, lanscape[145] + 0.78 -0.716, 0.56, lanscape[145] + 0.78 -0.705, logCenterColor, logOuterColor, 1.7 * M_PI, 2.45 * M_PI, false);
+	circle(0.023, 0.558, lanscape[145] + 0.78 - 0.716, 0.56, lanscape[145] + 0.78 - 0.705, logCenterColor, logOuterColor, 1.7 * M_PI, 2.45 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
-		glColor4f(0.388235, 0.2, 0.0235,1);
-		glVertex2f(0.43, lanscape[145] + 0.78 -0.845);
-		glVertex2f(0.54, lanscape[145] + 0.78 -0.7);
-		glColor4f(0.6392, 0.3412, 0.0627,1);
-		glVertex2f(0.455, lanscape[145] + 0.78 -0.8525);
-		glVertex2f(0.56, lanscape[145] + 0.78 -0.705);
-		glColor4f(0.388235, 0.2, 0.0235,1);
-		glVertex2f(0.48, lanscape[145] + 0.78 -0.86);
-		glVertex2f(0.58, lanscape[145] + 0.78 -0.71);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	glVertex2f(0.43, lanscape[145] + 0.78 - 0.845);
+	glVertex2f(0.54, lanscape[145] + 0.78 - 0.7);
+	glColor4f(0.6392, 0.3412, 0.0627, 1);
+	glVertex2f(0.455, lanscape[145] + 0.78 - 0.8525);
+	glVertex2f(0.56, lanscape[145] + 0.78 - 0.705);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	glVertex2f(0.48, lanscape[145] + 0.78 - 0.86);
+	glVertex2f(0.58, lanscape[145] + 0.78 - 0.71);
 	glEnd();
-	circle(0.0235, 0.498, lanscape[145] + 0.78 -0.713, 0.49, lanscape[145] + 0.78 -0.7, logCenterColor, logOuterColor, 1.5 * M_PI, 2.1 * M_PI, false);
+	circle(0.0235, 0.498, lanscape[145] + 0.78 - 0.713, 0.49, lanscape[145] + 0.78 - 0.7, logCenterColor, logOuterColor, 1.5 * M_PI, 2.1 * M_PI, false);
 	glBegin(GL_QUAD_STRIP);
-		glColor4f(0.388235, 0.2, 0.0235,1);
-		glVertex2f(0.6, lanscape[145] + 0.78 -0.87);
-		glVertex2f(0.475, lanscape[145] + 0.78 -0.71);
-		glColor4f(0.6392, 0.3412, 0.0627,1);
-		glVertex2f(0.6225, lanscape[145] + 0.78 -0.86);
-		glVertex2f(0.49, lanscape[145] + 0.78 -0.7);
-		glColor4f(0.388235, 0.2, 0.0235,1);
-		glVertex2f(0.645, lanscape[145] + 0.78 -0.85);
-		glVertex2f(0.505, lanscape[145] + 0.78 -0.69);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	glVertex2f(0.6, lanscape[145] + 0.78 - 0.87);
+	glVertex2f(0.475, lanscape[145] + 0.78 - 0.71);
+	glColor4f(0.6392, 0.3412, 0.0627, 1);
+	glVertex2f(0.6225, lanscape[145] + 0.78 - 0.86);
+	glVertex2f(0.49, lanscape[145] + 0.78 - 0.7);
+	glColor4f(0.388235, 0.2, 0.0235, 1);
+	glVertex2f(0.645, lanscape[145] + 0.78 - 0.85);
+	glVertex2f(0.505, lanscape[145] + 0.78 - 0.69);
 	glEnd();
 
 	circle(0.0235, 0.522, lanscape[145] + 0.78 - 0.72, 0.5175, lanscape[145] + 0.78 - 0.705, logCenterColor, logOuterColor, 1.60 * M_PI, 2.2 * M_PI, false);
@@ -417,24 +417,24 @@ void display(void)
 		glColor4f(1, 0, 0, 1);
 		glBegin(GL_TRIANGLE_FAN);
 		glColor4f(1, 0, 0, 1);
-		glVertex2f(0.53 + 0.022 * sin(fireAngle), lanscape[145] + 0.07 +fireCtop);
+		glVertex2f(0.53 + 0.022 * sin(fireAngle), lanscape[145] + 0.07 + fireCtop);
 		glColor4f(1, 0.6196, 0, 0.8);
-		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[0]].y2; y += 0.001) {glVertex2f((float)(fireEquation[fireOrder[0]].A * pow((y - fireEquation[fireOrder[0]].y2), 2) + fireEquation[fireOrder[0]].x2), y);}
-		for (float y = fireEquation[fireOrder[0]].y2; y <= lanscape[145] + 0.18+fireCtop; y += 0.001) { glVertex2f(fireEquation[fireOrder[0]].B * pow((y - fireEquation[fireOrder[0]].y2), 2) + fireEquation[fireOrder[0]].x2, y); }
-		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[0]].y3; y += 0.001) {glVertex2f(fireEquation[fireOrder[0]].A2 * pow((y - fireEquation[fireOrder[0]].y3), 2) + fireEquation[fireOrder[0]].x3, y);}
-		for (float y = fireEquation[fireOrder[0]].y3; y <= lanscape[145] + 0.18 + fireCtop; y += 0.001) {glVertex2f(fireEquation[fireOrder[0]].B2 * pow((y - fireEquation[fireOrder[0]].y3), 2) + fireEquation[fireOrder[0]].x3, y);}
+		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[0]].y2; y += 0.001) { glVertex2f((float)(fireEquation[fireOrder[0]].A * pow((y - fireEquation[fireOrder[0]].y2), 2) + fireEquation[fireOrder[0]].x2), y); }
+		for (float y = fireEquation[fireOrder[0]].y2; y <= lanscape[145] + 0.18 + fireCtop; y += 0.001) { glVertex2f(fireEquation[fireOrder[0]].B * pow((y - fireEquation[fireOrder[0]].y2), 2) + fireEquation[fireOrder[0]].x2, y); }
+		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[0]].y3; y += 0.001) { glVertex2f(fireEquation[fireOrder[0]].A2 * pow((y - fireEquation[fireOrder[0]].y3), 2) + fireEquation[fireOrder[0]].x3, y); }
+		for (float y = fireEquation[fireOrder[0]].y3; y <= lanscape[145] + 0.18 + fireCtop; y += 0.001) { glVertex2f(fireEquation[fireOrder[0]].B2 * pow((y - fireEquation[fireOrder[0]].y3), 2) + fireEquation[fireOrder[0]].x3, y); }
 		glEnd();
 	}
-	
+
 
 
 	float stoneCenterColor[4] = { 0.77255, 0.77255, 0.77255,1 };
 	float stoneOuterColor[4] = { 0.67843, 0.65098, 0.62745,1 };
-	circle(0.02, 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.5 * M_PI), 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.5* M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
-	circle(0.02, 0.53 + 0.15 * sin(1 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1 * M_PI), 0.53 + 0.15 * sin(1 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
-	circle(0.02, 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.5 * M_PI), 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.5 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
-	circle(0.02, 0.53 + 0.15 * sin(0.75 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.75 * M_PI), 0.53 + 0.15 * sin(0.75 * M_PI), lanscape[145] - 0.04 + 0.115* cos(0.75 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
-	circle(0.02, 0.53 + 0.15 * sin(1.25 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.25 * M_PI), 0.53 + 0.15 * sin(1.25 * M_PI), lanscape[145] - 0.04 + 0.115* cos(1.25 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+	circle(0.02, 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1.5 * M_PI), 0.53 + 0.15 * sin(1.5 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1.5 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+	circle(0.02, 0.53 + 0.15 * sin(1 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1 * M_PI), 0.53 + 0.15 * sin(1 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+	circle(0.02, 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(0.5 * M_PI), 0.53 + 0.15 * sin(0.5 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(0.5 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+	circle(0.02, 0.53 + 0.15 * sin(0.75 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(0.75 * M_PI), 0.53 + 0.15 * sin(0.75 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(0.75 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
+	circle(0.02, 0.53 + 0.15 * sin(1.25 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1.25 * M_PI), 0.53 + 0.15 * sin(1.25 * M_PI), lanscape[145] - 0.04 + 0.115 * cos(1.25 * M_PI), stoneCenterColor, stoneOuterColor, 0, 2 * M_PI, false);
 
 
 	char text[] = "bird";
@@ -455,9 +455,9 @@ void display(void)
 			float x, y;
 			float birdCenterColor[4] = { 0.2118, 0.1529, 0,1 };
 			float birdOuterColor[4] = { 0.2118, 0.1529, 0,1 };
-			glColor4f(0.2118, 0.1529, 0,1);
+			glColor4f(0.2118, 0.1529, 0, 1);
 
-			
+
 
 			glBegin(GL_POLYGON);
 			rotate(0, 0.035355, 0.017678, &x, &y);
@@ -518,13 +518,13 @@ void display(void)
 			glEnd();
 
 
-			glColor4f(0, 0, 0,1);
+			glColor4f(0, 0, 0, 1);
 			glBegin(GL_TRIANGLES);
 			glVertex2f(0 + 0.06, 0 + 0.01);
 			glVertex2f(0 + 0.06, 0 + 0.02);
 			glVertex2f(0 + 0.07, 0 + 0.012);
 			glEnd();
-			glColor4f(0.2118, 0.1529, 0,1);
+			glColor4f(0.2118, 0.1529, 0, 1);
 
 			circle(0.005, 0 - 0.0625, 0 + 0.007375, 0 - 0.0625, 0 + 0.007375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
 			circle(0.00375, 0 - 0.065, 0 + 0.02375, 0 - 0.065, 0 + 0.02375, birdCenterColor, birdOuterColor, 1 * M_PI, 2 * M_PI, false);
@@ -541,7 +541,7 @@ void display(void)
 			glPopMatrix();
 		}
 	}
-	glColor4f(0, 0, 0,1);
+	glColor4f(0, 0, 0, 1);
 	printText("Number of Snow Particles:", -0.95, 0.85); // prints the snow amount
 	for (int i = 0; i < 4; i++) {
 		glRasterPos2f(-0.95 + 0.0225 * (strlen("Number of Snow Particles:") + i), 0.85);
@@ -564,105 +564,106 @@ void display(void)
 	printText("Press s to stop snow", -0.95, 0.7);// prints the comands
 	printText("Press f to toggle fire", -0.95, 0.65);// prints the comands
 	printText("Click to summon bird", -0.95, 0.6);// prints the comands
-	glColor4f(0.95, 0.95, 0.95,1);
+	glColor4f(0.95, 0.95, 0.95, 1);
 	if (fire == true) {
-		if (lightningSpawn+2 > framesPassed) {
+		if (lightningSpawn + 2 > framesPassed) {
 			glLineWidth(7);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[0],1);
-				glVertex2f(lightningPoints[1], 0.55);
+			glVertex2f(lightningPoints[0], 1);
+			glVertex2f(lightningPoints[1], 0.55);
 			glEnd();
-		}else if (lightningSpawn + 4 > framesPassed) {
+		}
+		else if (lightningSpawn + 4 > framesPassed) {
 			glLineWidth(7);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[0], 1);
-				glVertex2f(lightningPoints[1], 0.55);
+			glVertex2f(lightningPoints[0], 1);
+			glVertex2f(lightningPoints[1], 0.55);
 			glEnd();
 			glLineWidth(6);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[1], 0.55);
-				glVertex2f(lightningPoints[2], 0.15);
+			glVertex2f(lightningPoints[1], 0.55);
+			glVertex2f(lightningPoints[2], 0.15);
 			glEnd();
 		}
 		else if (lightningSpawn + 6 > framesPassed) {
 			glLineWidth(7);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[0], 1);
-				glVertex2f(lightningPoints[1], 0.55);
+			glVertex2f(lightningPoints[0], 1);
+			glVertex2f(lightningPoints[1], 0.55);
 			glEnd();
 			glLineWidth(6);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[1], 0.55);
-				glVertex2f(lightningPoints[2], 0.15);
+			glVertex2f(lightningPoints[1], 0.55);
+			glVertex2f(lightningPoints[2], 0.15);
 			glEnd();
 			glLineWidth(5);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[2], 0.15);
-				glVertex2f(lightningPoints[3], -0.25);
+			glVertex2f(lightningPoints[2], 0.15);
+			glVertex2f(lightningPoints[3], -0.25);
 			glEnd();
 		}
 		else if (lightningSpawn + 40 > framesPassed) {
 			glLineWidth(7);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[0], 1);
-				glVertex2f(lightningPoints[1], 0.55);
+			glVertex2f(lightningPoints[0], 1);
+			glVertex2f(lightningPoints[1], 0.55);
 			glEnd();
 			glLineWidth(6);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[1], 0.55);
-				glVertex2f(lightningPoints[2], 0.15);
+			glVertex2f(lightningPoints[1], 0.55);
+			glVertex2f(lightningPoints[2], 0.15);
 			glEnd();
 			glLineWidth(5);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[2], 0.15);
-				glVertex2f(lightningPoints[3], -0.25);
+			glVertex2f(lightningPoints[2], 0.15);
+			glVertex2f(lightningPoints[3], -0.25);
 			glEnd();
 			glLineWidth(4);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[3], -0.25);
-				glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
+			glVertex2f(lightningPoints[3], -0.25);
+			glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
 			glEnd();
 		}
-		else if (lightningSpawn + 42> framesPassed) {
+		else if (lightningSpawn + 42 > framesPassed) {
 			glLineWidth(6);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[1], 0.55);
-				glVertex2f(lightningPoints[2], 0.15);
+			glVertex2f(lightningPoints[1], 0.55);
+			glVertex2f(lightningPoints[2], 0.15);
 			glEnd();
 			glLineWidth(5);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[2], 0.15);
-				glVertex2f(lightningPoints[3], -0.25);
+			glVertex2f(lightningPoints[2], 0.15);
+			glVertex2f(lightningPoints[3], -0.25);
 			glEnd();
 			glLineWidth(4);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[3], -0.25);
-				glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
+			glVertex2f(lightningPoints[3], -0.25);
+			glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
 			glEnd();
 		}
 		else if (lightningSpawn + 44 > framesPassed) {
 			glLineWidth(5);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[2], 0.15);
-				glVertex2f(lightningPoints[3], -0.25);
+			glVertex2f(lightningPoints[2], 0.15);
+			glVertex2f(lightningPoints[3], -0.25);
 			glEnd();
 			glLineWidth(4);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[3], -0.25);
-				glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
+			glVertex2f(lightningPoints[3], -0.25);
+			glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
 			glEnd();
 		}
 		else if (lightningSpawn + 46 > framesPassed) {
 			glLineWidth(4);
 			glBegin(GL_LINES);
-				glVertex2f(lightningPoints[3], -0.25);
-				glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
+			glVertex2f(lightningPoints[3], -0.25);
+			glVertex2f(lightningPoints[4], lanscape[145] + 0.05);
 			glEnd();
 		}
-		
+
 	}
-	
-	
+
+
 
 	glutSwapBuffers();
 }
@@ -698,7 +699,7 @@ void circle(float radius, float x, float y, float centerX, float centerY, float 
 	glEnd();
 }
 void alterLanscape(float x, float y) {
-	int heightIndex = round((x +1)* 100);
+	int heightIndex = round((x + 1) * 100);
 	if (snowHeight[1][heightIndex] < y) {
 		snowHeight[1][heightIndex] = y - 0.003;
 	}
@@ -706,7 +707,7 @@ void alterLanscape(float x, float y) {
 		snowHeight[2][heightIndex] = y - 0.003;
 		snowHeight[3][heightIndex] = y - 0.003;
 	}
- }
+}
 
 /*
 	Called when the OpenGL window has been resized.
@@ -757,21 +758,15 @@ void lightning() {
 	int multiplyer = 1;
 	if (rand() % 2 == 1) { multiplyer = -1; }
 	for (int i = 3; i >= 0; i--) {
-		lightningPoints[i] = ((((float)rand() / RAND_MAX) * 0.25f) + 0.1f) *(pow(-1,i)*multiplyer) + lightningPoints[i + 1];
+		lightningPoints[i] = ((((float)rand() / RAND_MAX) * 0.25f) + 0.1f) * (pow(-1, i) * multiplyer) + lightningPoints[i + 1];
 	}
-	
+
 
 }
 
 void keyPressed(unsigned char key, int x, int y)
 {
 	switch (tolower(key)) {
-		/*
-			TEMPLATE: Add any new character key controls here.
-
-			Rather than using literals (e.g. "d" for diagnostics), create a new KEY_
-			definition in the "Keyboard Input Handling Setup" section of this file.
-		*/
 	case KEY_Q:
 		exit(0);
 		break;
@@ -803,7 +798,7 @@ void idle(void)
 		// so we're not taking up the CPU until we need to render another frame.
 		unsigned int timeLeft = FRAME_TIME - frameTimeElapsed;
 		Sleep(timeLeft);
-		
+
 	}
 
 	// Begin processing the next frame.
@@ -815,16 +810,16 @@ void idle(void)
 	glutPostRedisplay(); // Tell OpenGL there's a new frame ready to be drawn.
 }
 
-void calculateFlame(float x2, float y2, float x3, float y3,float top,float ctop, int layer) {
+void calculateFlame(float x2, float y2, float x3, float y3, float top, float ctop, int layer) {
 	fireEquation[layer].x2 = x2;
 	fireEquation[layer].y2 = y2;
 	fireCtop = ctop;
 	fireEquation[layer].A = (0.53 - fireEquation[layer].x2) / pow((lanscape[145] - 0.08 - fireEquation[layer].y2), 2);
-	fireEquation[layer].B = (top+0.003 - fireEquation[layer].x2) / pow((lanscape[145] + 0.18+ctop - fireEquation[layer].y2), 2);
+	fireEquation[layer].B = (top + 0.003 - fireEquation[layer].x2) / pow((lanscape[145] + 0.18 + ctop - fireEquation[layer].y2), 2);
 	fireEquation[layer].x3 = x3;
 	fireEquation[layer].y3 = y3;
 	fireEquation[layer].A2 = (0.53 - fireEquation[layer].x3) / pow((lanscape[145] - 0.08 - fireEquation[layer].y3), 2);
-	fireEquation[layer].B2 = (top-0.003  - fireEquation[layer].x3) / pow((lanscape[145] + 0.18+ctop - fireEquation[layer].y3), 2);
+	fireEquation[layer].B2 = (top - 0.003 - fireEquation[layer].x3) / pow((lanscape[145] + 0.18 + ctop - fireEquation[layer].y3), 2);
 }
 /******************************************************************************
  * Animation-Specific Functions (Add your own functions at the end of this section)
@@ -872,7 +867,7 @@ void init(void)
 		}
 		snowHeight[0][i] = snowHeight[1][i] = snowHeight[2][i] = snowHeight[3][i] = lanscape[i] - 0.003;
 	}
-	calculateFlame(0.53 - 0.1, lanscape[145] + 0.07, 0.53 + 0.1, lanscape[145] + 0.07,0.53,0,0);
+	calculateFlame(0.53 - 0.1, lanscape[145] + 0.07, 0.53 + 0.1, lanscape[145] + 0.07, 0.53, 0, 0);
 	calculateFlame(0.53 - 0.02, lanscape[145] + 0.07, 0.53 + 0.02, lanscape[145] + 0.07, 0.53, 0, 1);
 	fireState = 0;
 	fireAngle = 0;
@@ -881,7 +876,6 @@ void init(void)
 
 void think(void)
 {
-	//srand((unsigned)time(NULL));
 	framesPassed++;
 
 	if (snowfall) {
@@ -904,7 +898,7 @@ void think(void)
 			int heightIndex = round((snow[i].location.x + 1) * 100);
 			if (heightIndex > 199) { heightIndex = 199; } // stops error where they round to the next one and go lower than the lanscape
 			if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[snow[i].depth][heightIndex] && snow[i].landTime == 0) {
-				snow[i].location.y = snowHeight[snow[i].depth][heightIndex]+ (snow[i].size / FramePixels);
+				snow[i].location.y = snowHeight[snow[i].depth][heightIndex] + (snow[i].size / FramePixels);
 				snow[i].landTime = framesPassed;
 				snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
 				snow[i].dy = 0;
@@ -913,15 +907,17 @@ void think(void)
 						snow[i].lifetime = 0;
 					}
 					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) {
-						snow[i].lifetime = (rand() % 3500 + 2000)* (snow[i].location.x-0.38) *-1.5;
+						snow[i].lifetime = (rand() % 3500 + 2000) * (snow[i].location.x - 0.38) * -1.5;
 					}
 					else if (snow[i].location.x >= 0.73) {
 						snow[i].lifetime = (rand() % 3500 + 2000) * ((snow[i].location.x - 0.68) * 1.5);
-					}else{ 
-						snow[i].lifetime = rand() % 3500 + 2000; 
 					}
-				}else{ 
-					snow[i].lifetime = rand() % 3500 + 2000; 
+					else {
+						snow[i].lifetime = rand() % 3500 + 2000;
+					}
+				}
+				else {
+					snow[i].lifetime = rand() % 3500 + 2000;
 				}
 				continue;
 			}
@@ -950,7 +946,7 @@ void think(void)
 					totalSnow--;
 				}
 			}
-			if (fire == true && lightningSpawn + 15 == framesPassed) {
+			if (fire == true && lightningSpawn + 6 == framesPassed) {
 				if (snow[i].landTime != 0) {
 					if (snow[i].location.x >= 0.33 && snow[i].location.x <= 0.73) {
 						snow[i].lifetime = 0;
@@ -966,10 +962,10 @@ void think(void)
 					else if (snow[i].location.x > -0.42 && snow[i].location.x <= 0.33) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.38) * -1.5)); }
 					else if (snow[i].location.x >= 0.73) { snow[i].lifetime = (snow[i].lifetime * ((snow[i].location.x - 0.68) * 1.5)); }
 					if (framesPassed > snow[i].landTime + snow[i].lifetime) {
-						
+
 					}
 				}
-				for (int x = 133; x <= 173; x ++) {
+				for (int x = 133; x <= 173; x++) {
 					snowHeight[0][x] = lanscape[x] - 0.003;
 					snowHeight[1][x] = lanscape[x] - 0.003;
 					snowHeight[2][x] = lanscape[x] - 0.003;
@@ -979,11 +975,11 @@ void think(void)
 			}
 			if (snow[i].location.y - (snow[i].size / FramePixels) < snowHeight[3][heightIndex]) {
 				snow[i].location.y = snowHeight[3][heightIndex] + (snow[i].size / FramePixels);
-				snow[i].location.y = snowHeight[snow[i].depth][heightIndex]+ (snow[i].size / FramePixels);
+				snow[i].location.y = snowHeight[snow[i].depth][heightIndex] + (snow[i].size / FramePixels);
 				snow[i].landTime = framesPassed;
 				snowHeight[snow[i].depth][heightIndex] += snow[i].size / FramePixels;
 				snow[i].dy = 0;
-				if (fire == true && lightningSpawn + 15 < framesPassed) {
+				if (fire == true && lightningSpawn + 6 < framesPassed) {
 					if (snow[i].location.x >= 0.33 && snow[i].location.x <= 0.73) {
 						snow[i].lifetime = 0;
 					}
@@ -997,12 +993,12 @@ void think(void)
 						snow[i].lifetime = rand() % 3500 + 2000;
 					}
 				}
-				if(snowHeight[snow[i].depth][heightIndex] < snow[i].location.y){ snowHeight[snow[i].depth][heightIndex] += snow[i].location.y;}
+				if (snowHeight[snow[i].depth][heightIndex] < snow[i].location.y) { snowHeight[snow[i].depth][heightIndex] += snow[i].location.y; }
 			}
 
 		}
 	}
-	
+
 
 	for (int i = 0; i < 80; i++) {
 		if (activeBird[i] == 1) {
@@ -1017,26 +1013,23 @@ void think(void)
 				birds[i].location.y = birds[i].formula.B * pow((birds[i].location.x - birds[i].formula.X2), 2) + birds[i].formula.Y2;
 				gradient = 2 * birds[i].formula.B * (birds[i].location.x - birds[i].formula.X2);
 			}
-			birds[i].theta = atan(gradient)*180/M_PI;
+			birds[i].theta = atan(gradient) * 180 / M_PI;
 			if (i != 0) {
 			}
 		}
 	}
-	if (fire == true && lightningSpawn + 6 == framesPassed) {
-		fireAngle += 0.06;
-		printf("fire state :%d", fireState);
-		if (fireState == 0) {
-			if (fireEquation[0].y2 < lanscape[145] + 0.09) {
-				calculateFlame(fireEquation[0].x2, fireEquation[0].y2 + 0.001, fireEquation[0].x3, fireEquation[0].y3 - 0.001, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle), 0);
-			}
-			else { fireState = 1; }
+	fireAngle += 0.06;
+	printf("fire state :%d", fireState);
+	if (fireState == 0) {
+		if (fireEquation[0].y2 < lanscape[145] + 0.09) {
+			calculateFlame(fireEquation[0].x2, fireEquation[0].y2 + 0.001, fireEquation[0].x3, fireEquation[0].y3 - 0.001, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle), 0);
 		}
-
-		else {
-			if (fireEquation[0].y3 < lanscape[145] + 0.09) {
-				calculateFlame(fireEquation[0].x2, fireEquation[0].y2 - 0.0005, fireEquation[0].x3, fireEquation[0].y3 + 0.0005, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle), 0);
-			}
-			else { fireState = 0; }
+		else { fireState = 1; }
+	}
+	else {
+		if (fireEquation[0].y3 < lanscape[145] + 0.09) {
+			calculateFlame(fireEquation[0].x2, fireEquation[0].y2 - 0.0005, fireEquation[0].x3, fireEquation[0].y3 + 0.0005, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle), 0);
 		}
+		else { fireState = 0; }
 	}
 }
