@@ -113,13 +113,13 @@ typedef struct {
 	float y3;
 	float A2;
 	float B2;
+	float angle;
+	int state;
 
 }flame;
-flame fireEquation[2];
-int fireOrder[2];
-float fireAngle;
-float fireCtop;
-int fireState;
+flame fireEquation;
+
+
 Partical  snow[50001];
 float lanscape[200];
 float snowHeight[4][200];
@@ -317,7 +317,7 @@ void display(void)
 		alterLanscape(-0.2875 + i * sin(1.6 * M_PI), lanscape[50] + 0.195 + i * cos(1.6 * M_PI));
 		glEnd();
 	}
-
+	// staff continued
 	glBegin(GL_QUAD_STRIP);
 	for (float i = 1.6 * M_PI; i <= 1.75 * M_PI; i += 0.01) {
 		if ((int)(i * 102) % 4 == 0) {
@@ -417,12 +417,12 @@ void display(void)
 		glColor4f(1, 0, 0, 1);
 		glBegin(GL_TRIANGLE_FAN);
 		glColor4f(1, 0, 0, 1);
-		glVertex2f(0.53 + 0.022 * sin(fireAngle), lanscape[145] + 0.07 + fireCtop);
+		glVertex2f(0.53 + 0.022 * sin(fireEquation.angle), lanscape[145] + 0.07 + 0.015 * cos(fireEquation.angle));
 		glColor4f(1, 0.6196, 0, 0.8);
-		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[0]].y2; y += 0.001) { glVertex2f((float)(fireEquation[fireOrder[0]].A * pow((y - fireEquation[fireOrder[0]].y2), 2) + fireEquation[fireOrder[0]].x2), y); }
-		for (float y = fireEquation[fireOrder[0]].y2; y <= lanscape[145] + 0.18 + fireCtop; y += 0.001) { glVertex2f(fireEquation[fireOrder[0]].B * pow((y - fireEquation[fireOrder[0]].y2), 2) + fireEquation[fireOrder[0]].x2, y); }
-		for (float y = lanscape[145] - 0.08; y < fireEquation[fireOrder[0]].y3; y += 0.001) { glVertex2f(fireEquation[fireOrder[0]].A2 * pow((y - fireEquation[fireOrder[0]].y3), 2) + fireEquation[fireOrder[0]].x3, y); }
-		for (float y = fireEquation[fireOrder[0]].y3; y <= lanscape[145] + 0.18 + fireCtop; y += 0.001) { glVertex2f(fireEquation[fireOrder[0]].B2 * pow((y - fireEquation[fireOrder[0]].y3), 2) + fireEquation[fireOrder[0]].x3, y); }
+		for (float y = lanscape[145] - 0.08; y < fireEquation.y2; y += 0.001) { glVertex2f((float)(fireEquation.A * pow((y - fireEquation.y2), 2) + fireEquation.x2), y); }
+		for (float y = fireEquation.y2; y <= lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle); y += 0.001) { glVertex2f(fireEquation.B * pow((y - fireEquation.y2), 2) + fireEquation.x2, y); }
+		for (float y = lanscape[145] - 0.08; y < fireEquation.y3; y += 0.001) { glVertex2f(fireEquation.A2 * pow((y - fireEquation.y3), 2) + fireEquation.x3, y); }
+		for (float y = fireEquation.y3; y <= lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle); y += 0.001) { glVertex2f(fireEquation.B2 * pow((y - fireEquation.y3), 2) + fireEquation.x3, y); }
 		glEnd();
 	}
 
@@ -810,16 +810,13 @@ void idle(void)
 	glutPostRedisplay(); // Tell OpenGL there's a new frame ready to be drawn.
 }
 
-void calculateFlame(float x2, float y2, float x3, float y3, float top, float ctop, int layer) {
-	fireEquation[layer].x2 = x2;
-	fireEquation[layer].y2 = y2;
-	fireCtop = ctop;
-	fireEquation[layer].A = (0.53 - fireEquation[layer].x2) / pow((lanscape[145] - 0.08 - fireEquation[layer].y2), 2);
-	fireEquation[layer].B = (top + 0.003 - fireEquation[layer].x2) / pow((lanscape[145] + 0.18 + ctop - fireEquation[layer].y2), 2);
-	fireEquation[layer].x3 = x3;
-	fireEquation[layer].y3 = y3;
-	fireEquation[layer].A2 = (0.53 - fireEquation[layer].x3) / pow((lanscape[145] - 0.08 - fireEquation[layer].y3), 2);
-	fireEquation[layer].B2 = (top - 0.003 - fireEquation[layer].x3) / pow((lanscape[145] + 0.18 + ctop - fireEquation[layer].y3), 2);
+void calculateFlame( float y2, float y3) {
+	fireEquation.y2 = y2;
+	fireEquation.A = (0.53 - fireEquation.x2) / pow((lanscape[145] - 0.08 - fireEquation.y2), 2);
+	fireEquation.B = (0.53 + 0.035 * sin(fireEquation.angle) + 0.003 - fireEquation.x2) / pow((lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle) - fireEquation.y2), 2);
+	fireEquation.y3 = y3;
+	fireEquation.A2 = (0.53 - fireEquation.x3) / pow((lanscape[145] - 0.08 - fireEquation.y3), 2);
+	fireEquation.B2 = (0.53 + 0.035 * sin(fireEquation.angle) - 0.003 - fireEquation.x3) / pow((lanscape[145] + 0.18 + 0.015 * cos(fireEquation.angle) - fireEquation.y3), 2);
 }
 /******************************************************************************
  * Animation-Specific Functions (Add your own functions at the end of this section)
@@ -867,11 +864,11 @@ void init(void)
 		}
 		snowHeight[0][i] = snowHeight[1][i] = snowHeight[2][i] = snowHeight[3][i] = lanscape[i] - 0.003;
 	}
-	calculateFlame(0.53 - 0.1, lanscape[145] + 0.07, 0.53 + 0.1, lanscape[145] + 0.07, 0.53, 0, 0);
-	calculateFlame(0.53 - 0.02, lanscape[145] + 0.07, 0.53 + 0.02, lanscape[145] + 0.07, 0.53, 0, 1);
-	fireState = 0;
-	fireAngle = 0;
-	fireOrder[0] = 0; fireOrder[1] = 1;
+	calculateFlame(lanscape[145] + 0.07, lanscape[145] + 0.07);
+	fireEquation.state = 0;
+	fireEquation.angle = 0;
+	fireEquation.x2 = 0.43;
+	fireEquation.x3 = 0.63;
 }
 
 void think(void)
@@ -1018,18 +1015,18 @@ void think(void)
 			}
 		}
 	}
-	fireAngle += 0.06;
-	printf("fire state :%d", fireState);
-	if (fireState == 0) {
-		if (fireEquation[0].y2 < lanscape[145] + 0.09) {
-			calculateFlame(fireEquation[0].x2, fireEquation[0].y2 + 0.001, fireEquation[0].x3, fireEquation[0].y3 - 0.001, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle), 0);
+	fireEquation.angle += 0.06;
+	printf("fire state :%d", fireEquation.state);
+	if (fireEquation.state == 0) {
+		if (fireEquation.y2 < lanscape[145] + 0.09) {
+			calculateFlame(fireEquation.y2 + 0.001, fireEquation.y3 - 0.001);
 		}
-		else { fireState = 1; }
+		else { fireEquation.state = 1; }
 	}
 	else {
-		if (fireEquation[0].y3 < lanscape[145] + 0.09) {
-			calculateFlame(fireEquation[0].x2, fireEquation[0].y2 - 0.0005, fireEquation[0].x3, fireEquation[0].y3 + 0.0005, 0.53 + 0.035 * sin(fireAngle), 0.015 * cos(fireAngle), 0);
+		if (fireEquation.y3 < lanscape[145] + 0.09) {
+			calculateFlame(fireEquation.y2 - 0.0005, fireEquation.y3 + 0.0005);
 		}
-		else { fireState = 0; }
+		else { fireEquation.state = 0; }
 	}
 }
